@@ -3,15 +3,13 @@ package com.buratud.interactions;
 import com.buratud.Env;
 import com.buratud.services.ComputerVision;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
-public class MessageInteractions {
+public class MessageInteraction {
     private final ComputerVision vision;
 
-    public MessageInteractions() {
+    public MessageInteraction() {
         vision = new ComputerVision(Env.AZURE_VISION_ENDPOINT, Env.AZURE_VISION_KEY);
     }
 

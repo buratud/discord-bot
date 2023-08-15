@@ -1,6 +1,6 @@
 package com.buratud;
 
-import com.buratud.interactions.MessageInteractions;
+import com.buratud.interactions.MessageInteraction;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.SelfUser;
@@ -11,10 +11,10 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import java.io.IOException;
 
 public class Main extends ListenerAdapter {
-    private final MessageInteractions message;
+    private final MessageInteraction message;
 
     private Main() {
-        message = new MessageInteractions();
+        message = new MessageInteraction();
     }
 
     public static void main(String[] args) throws InterruptedException {
