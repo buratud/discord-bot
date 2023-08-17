@@ -33,7 +33,7 @@ public class Main extends ListenerAdapter {
             case "OCR" -> {
                 try {
                     message.ocr(event);
-                } catch (IOException | InterruptedException e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }

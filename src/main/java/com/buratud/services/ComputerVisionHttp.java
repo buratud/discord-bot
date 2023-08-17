@@ -29,7 +29,7 @@ public class ComputerVisionHttp {
         httpClient = HttpClient.newHttpClient();
     }
 
-    public String[] Read(String url) throws IOException, InterruptedException {
+    public String Read(String url) throws IOException, InterruptedException {
         ReadRequest body = new ReadRequest(url);
         String bodyString = gson.toJson(body);
         HttpRequest request = HttpRequest.newBuilder()
@@ -40,16 +40,18 @@ public class ComputerVisionHttp {
                 .build();
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         Optional<String> taskUrl = response.headers().firstValue("Operation-Location");
-        if (taskUrl.isEmpty()) {
-            return null;
-        }
-        request = HttpRequest.newBuilder()
-                .uri(URI.create(taskUrl.get()))
+        return taskUrl.orElse(null);
+    }
+
+    public String[] ReadResult(String taskUrl) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(taskUrl))
                 .header("Ocp-Apim-Subscription-Key", key)
                 .method("GET", HttpRequest.BodyPublishers.noBody())
                 .build();
         boolean ok = false;
         ReadResponseBody result = null;
+        HttpResponse<String> response;
         while (!ok) {
             response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             result = gson.fromJson(response.body(), ReadResponseBody.class);
