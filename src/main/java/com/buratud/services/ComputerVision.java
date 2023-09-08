@@ -9,10 +9,10 @@ public class ComputerVision {
         this.client = new ComputerVisionHttp(endpoint, key);
     }
 
-    public String[] extractText(String url) throws Exception {
+    public String[] extractText(String url) throws IOException, InterruptedException {
         String taskUrl = client.Read(url);
         if (taskUrl == null) {
-            throw new Exception("Failed to create OCR");
+            throw new IOException("Failed to create OCR");
         }
         return client.ReadResult(taskUrl);
     }

@@ -1,6 +1,8 @@
 package com.buratud.interactions;
 
-import com.buratud.Env;
+import java.io.IOException;
+
+import com.buratud.Service;
 import com.buratud.services.ComputerVision;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 
@@ -8,10 +10,11 @@ public class MessageInteraction {
     private final ComputerVision vision;
 
     public MessageInteraction() {
-        vision = new ComputerVision(Env.AZURE_VISION_ENDPOINT, Env.AZURE_VISION_KEY);
+        Service service = Service.getInstance();
+        vision = service.vision;
     }
 
-    public void ocr(MessageContextInteractionEvent event) throws Exception {
+    public void ocr(MessageContextInteractionEvent event) throws IOException, InterruptedException {
         String url = event.getTarget().getAttachments().get(0).getUrl();
         event.deferReply().queue();
         String[] result = vision.extractText(url);
