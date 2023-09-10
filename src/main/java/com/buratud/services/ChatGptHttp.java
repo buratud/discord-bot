@@ -9,6 +9,8 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 
+import org.json.JSONObject;
+
 import com.buratud.data.openai.chat.ChatCompletionRequest;
 import com.buratud.data.openai.chat.ChatCompletionResponse;
 import com.buratud.data.openai.chat.Role;
@@ -51,12 +53,16 @@ public class ChatGptHttp {
     }
 
     public ModerationResponse moderateMessage(String message) throws IOException, InterruptedException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("input", message);
+        String jsonResult = jsonObject.toString();
+
         HttpClient client = HttpClient.newBuilder().build();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(moderationUrl))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + apiKey)
-                .POST(BodyPublishers.ofString("{\"input\": \"" + message + "\"}"))
+                .POST(BodyPublishers.ofString(jsonResult))
                 .build();
 
         HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
