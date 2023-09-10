@@ -107,11 +107,13 @@ public class Main extends ListenerAdapter {
             Message message = event.getMessage();
             String rawMessage = message.getContentRaw();
             if (message.getMentions().isMentioned(event.getJDA().getSelfUser())) {
-                int pos = rawMessage.indexOf(String.format("@<%s>", event.getJDA().getSelfUser().getId()));
-                rawMessage = rawMessage.substring(pos + 1).trim();
+                int pos = rawMessage.indexOf(String.format("<@%s>", event.getJDA().getSelfUser().getId()));
+                int lastPos = rawMessage.indexOf('>', pos);
+                rawMessage = rawMessage.substring(lastPos + 1).trim();
                 String flagged = chatGPT.moderationCheck(rawMessage);
                 if (flagged != null) {
-                    message.reply(flagged);
+                    message.reply(flagged).queue();
+                    return;
                 }
                 String res = chatGPT.send(event.getChannel().getId(), event.getAuthor().getId(), rawMessage);
                 List<String> responses = splitResponse(res);
@@ -125,6 +127,7 @@ public class Main extends ListenerAdapter {
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
+            event.getMessage().reply("Something went wrong, try again later.").queue();
         }
     }
 
