@@ -62,6 +62,11 @@
             <artifactId>kotlin-stdlib</artifactId>
             <version>1.9.10</version> <!-- Replace with the desired version -->
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core</artifactId>
+            <version>1.7.2</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -78,7 +83,8 @@
                         </goals>
                         <configuration>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.buratud.Main</mainClass>
                                 </transformer>
                             </transformers>
