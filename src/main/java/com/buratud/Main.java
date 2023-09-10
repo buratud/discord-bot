@@ -136,14 +136,10 @@ public class Main extends ListenerAdapter {
         int strlen = response.length();
         int last_index = 0;
         boolean is_code = false;
+        if (last_index == -1) {
+            throw new IllegalArgumentException("Split response failed.");
+        }
         while (last_index < strlen) {
-            if (last_index == -1) {
-                throw new IllegalArgumentException("Split response failed.");
-            }
-            if (last_index + 2000 > strlen) {
-                responses.add(response.substring(last_index));
-                break;
-            }
             if (is_code) {
                 int end = response.indexOf("```", last_index + 3);
                 if (end != -1) {
@@ -157,6 +153,10 @@ public class Main extends ListenerAdapter {
                 last_index = end + 1;
                 is_code = false;
             } else {
+                if (last_index + 2000 > strlen) {
+                    responses.add(response.substring(last_index));
+                    break;
+                }
                 int end = response.indexOf("\n```", last_index);
                 if (end == -1 || end - last_index > 2000) {
                     end = response.lastIndexOf('\n', last_index + 2000);
