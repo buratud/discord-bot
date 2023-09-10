@@ -5,6 +5,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.buratud.interactions.CommandInteraction;
 import com.buratud.interactions.MessageInteraction;
@@ -29,6 +31,7 @@ public class Main extends ListenerAdapter {
     private final CommandInteraction command;
     private final ChatGPT chatGPT;
     private final HashMap<String, String> fileExtMap;
+    private final ExecutorService executor;
 
     private Main() throws IOException {
         Service service = Service.getInstance();
@@ -36,60 +39,58 @@ public class Main extends ListenerAdapter {
         command = new CommandInteraction();
         chatGPT = service.chatgpt;
         fileExtMap = createFileExtensionMap();
+        executor = Executors.newCachedThreadPool();
     }
 
     public static void main(String[] args) throws InterruptedException, IOException {
-        JDA jda = JDABuilder.createDefault(Env.DISCORD_TOKEN)
-                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-                .addEventListeners(new Main())
-                .build();
+        JDA jda = JDABuilder.createDefault(Env.DISCORD_TOKEN).enableIntents(GatewayIntent.MESSAGE_CONTENT).addEventListeners(new Main()).build();
         jda.awaitReady();
-        jda.updateCommands().addCommands(
-                Commands.message("OCR"),
-                Commands.slash("chatgpt", "ChatGPT related command.")
-                        .addSubcommands(new SubcommandData("reset", "Reset chat history.")))
-                .queue();
+        jda.updateCommands().addCommands(Commands.message("OCR"), Commands.slash("chatgpt", "ChatGPT related command.").addSubcommands(new SubcommandData("reset", "Reset chat history."))).queue();
     }
 
     @Override
     public void onMessageContextInteraction(MessageContextInteractionEvent event) {
-        try {
-            switch (event.getName()) {
-                case "OCR" -> {
-                    message.ocr(event);
+        executor.submit(() -> {
+            try {
+                switch (event.getName()) {
+                    case "OCR" -> {
+                        message.ocr(event);
+                    }
                 }
+            } catch (Exception e) {
+                if (event.isAcknowledged()) {
+                    event.getHook().sendMessage("Something went wrong, try again later.").queue();
+                } else {
+                    event.reply("Something went wrong, try again later.").setEphemeral(true).queue();
+                }
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            if (event.isAcknowledged()) {
-                event.getHook().sendMessage("Something went wrong, try again later.").queue();
-            } else {
-                event.reply("Something went wrong, try again later.").setEphemeral(true).queue();
-            }
-            e.printStackTrace();
-        }
+        });
     }
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        try {
-            switch (event.getName()) {
-                case "chatgpt" -> {
-                    String subName = event.getSubcommandName();
-                    switch (subName) {
-                        case "reset" -> {
-                            command.resetChatHistory(event);
+        executor.submit(() -> {
+            try {
+                switch (event.getName()) {
+                    case "chatgpt" -> {
+                        String subName = event.getSubcommandName();
+                        switch (subName) {
+                            case "reset" -> {
+                                command.resetChatHistory(event);
+                            }
                         }
                     }
                 }
+            } catch (Exception e) {
+                if (event.isAcknowledged()) {
+                    event.getHook().sendMessage("Something went wrong, try again later.").queue();
+                } else {
+                    event.reply("Something went wrong, try again later.").setEphemeral(true).queue();
+                }
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            if (event.isAcknowledged()) {
-                event.getHook().sendMessage("Something went wrong, try again later.").queue();
-            } else {
-                event.reply("Something went wrong, try again later.").setEphemeral(true).queue();
-            }
-            e.printStackTrace();
-        }
+        });
     }
 
     @Override
@@ -100,35 +101,37 @@ public class Main extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        try {
-            if (event.getAuthor().isBot()) {
-                return;
-            }
-            Message message = event.getMessage();
-            String rawMessage = message.getContentRaw();
-            if (message.getMentions().isMentioned(event.getJDA().getSelfUser())) {
-                int pos = rawMessage.indexOf(String.format("<@%s>", event.getJDA().getSelfUser().getId()));
-                int lastPos = rawMessage.indexOf('>', pos);
-                rawMessage = rawMessage.substring(lastPos + 1).trim();
-                String flagged = chatGPT.moderationCheck(rawMessage);
-                if (flagged != null) {
-                    message.reply(flagged).queue();
+        executor.submit(() -> {
+            try {
+                if (event.getAuthor().isBot()) {
                     return;
                 }
-                String res = chatGPT.send(event.getChannel().getId(), event.getAuthor().getId(), rawMessage);
-                List<String> responses = splitResponse(res);
-                for (String response : responses) {
-                    if (response.startsWith("```")) {
-                        message.replyFiles(convertToDiscordFile(response)).queue();
-                    } else {
-                        message.reply(response).queue();
+                Message message = event.getMessage();
+                String rawMessage = message.getContentRaw();
+                if (message.getMentions().isMentioned(event.getJDA().getSelfUser())) {
+                    int pos = rawMessage.indexOf(String.format("<@%s>", event.getJDA().getSelfUser().getId()));
+                    int lastPos = rawMessage.indexOf('>', pos);
+                    rawMessage = rawMessage.substring(lastPos + 1).trim();
+                    String flagged = chatGPT.moderationCheck(rawMessage);
+                    if (flagged != null) {
+                        message.reply(flagged).queue();
+                        return;
+                    }
+                    String res = chatGPT.send(event.getChannel().getId(), event.getAuthor().getId(), rawMessage);
+                    List<String> responses = splitResponse(res);
+                    for (String response : responses) {
+                        if (response.startsWith("```")) {
+                            message.replyFiles(convertToDiscordFile(response)).queue();
+                        } else {
+                            message.reply(response).queue();
+                        }
                     }
                 }
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+                event.getMessage().reply("Something went wrong, try again later.").queue();
             }
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-            event.getMessage().reply("Something went wrong, try again later.").queue();
-        }
+        });
     }
 
     public static List<String> splitResponse(String response) {
@@ -215,7 +218,6 @@ public class Main extends ListenerAdapter {
         int lastNewLine = response.lastIndexOf('\n');
         String firstLine = response.substring(0, firstNewLine);
         String extension = detectFileExtension(firstLine);
-        return FileUpload.fromData(response.substring(firstNewLine + 1, lastNewLine).getBytes(StandardCharsets.UTF_8),
-                "code" + extension);
+        return FileUpload.fromData(response.substring(firstNewLine + 1, lastNewLine).getBytes(StandardCharsets.UTF_8), "code" + extension);
     }
 }
