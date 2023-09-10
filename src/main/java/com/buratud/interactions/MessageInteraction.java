@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionE
 public class MessageInteraction {
     private final ComputerVision vision;
 
-    public MessageInteraction() {
+    public MessageInteraction() throws IOException {
         Service service = Service.getInstance();
         vision = service.vision;
     }

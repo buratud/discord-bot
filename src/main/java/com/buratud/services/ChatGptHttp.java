@@ -53,6 +53,7 @@ public class ChatGptHttp {
     }
 
     public ModerationResponse moderateMessage(String message) throws IOException, InterruptedException {
+        // TODO: Make seperate class for this and use gson
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("input", message);
         String jsonResult = jsonObject.toString();

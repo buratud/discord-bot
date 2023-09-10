@@ -30,7 +30,7 @@ public class Main extends ListenerAdapter {
     private final ChatGPT chatGPT;
     private final HashMap<String, String> fileExtMap;
 
-    private Main() {
+    private Main() throws IOException {
         Service service = Service.getInstance();
         message = new MessageInteraction();
         command = new CommandInteraction();
@@ -38,7 +38,7 @@ public class Main extends ListenerAdapter {
         fileExtMap = createFileExtensionMap();
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
         JDA jda = JDABuilder.createDefault(Env.DISCORD_TOKEN)
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
                 .addEventListeners(new Main())
