@@ -35,7 +35,7 @@ public class ChatGPT {
         String messageRes = response.choices.get(0).message.content;
         history.add(new Message(Role.ASSISTANT, messageRes));
         store.save(channelId, userId, history);
-        return messageRes;
+        return String.format("%s\n\nTotal tokens: %d", messageRes, response.usage.totalTokens);
     }
 
     public String moderationCheck(String message) throws IOException, InterruptedException {
@@ -43,7 +43,7 @@ public class ChatGPT {
         if (response.results.get(0).flagged) {
             for (Map.Entry<String, Boolean> item : response.results.get(0).categories.entrySet()) {
                 if (item.getValue()) {
-                    return String.format("Message was block due to %s", item.getKey());
+                    return String.format("Message was blocked due to %s", item.getKey());
                 }
             }
         }
