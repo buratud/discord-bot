@@ -9,22 +9,14 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 
-import org.json.JSONObject;
-
 import com.buratud.data.openai.chat.ChatCompletionRequest;
 import com.buratud.data.openai.chat.ChatCompletionResponse;
-import com.buratud.data.openai.chat.Role;
-import com.buratud.data.openai.chat.RoleSerializer;
+import com.buratud.data.openai.moderation.ModerationRequest;
 import com.buratud.data.openai.moderation.ModerationResponse;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 public class ChatGptHttp {
-
     private final HttpClient client;
     private final String apiKey;
-
-    Gson gson;
 
     private static final String chatUrl = "https://api.openai.com/v1/chat/completions";
     private static final String moderationUrl = "https://api.openai.com/v1/moderations";
@@ -32,13 +24,12 @@ public class ChatGptHttp {
     public ChatGptHttp(String apiKey) {
         this.client = HttpClient.newBuilder().build();
         this.apiKey = apiKey;
-        gson = new GsonBuilder().registerTypeAdapter(Role.class, new RoleSerializer()).create();
     }
 
     public ChatCompletionResponse sendChatCompletionRequest(ChatCompletionRequest body)
             throws IOException, InterruptedException {
 
-        String requestBody = gson.toJson(body);
+        String requestBody = body.toJson();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(chatUrl))
                 .header("Content-Type", "application/json")
@@ -47,16 +38,14 @@ public class ChatGptHttp {
                 .build();
 
         HttpResponse<String> responseStr = client.send(request, BodyHandlers.ofString());
-        ChatCompletionResponse response = ChatCompletionResponse.fromJson(responseStr.body());
 
-        return response;
+        return ChatCompletionResponse.fromJson(responseStr.body());
     }
 
     public ModerationResponse moderateMessage(String message) throws IOException, InterruptedException {
-        // TODO: Make seperate class for this and use gson
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("input", message);
-        String jsonResult = jsonObject.toString();
+        ModerationRequest moderationRequest = new ModerationRequest();
+        moderationRequest.input = message;
+        String jsonResult = moderationRequest.toString();
 
         HttpClient client = HttpClient.newBuilder().build();
         HttpRequest request = HttpRequest.newBuilder()
@@ -67,7 +56,6 @@ public class ChatGptHttp {
                 .build();
 
         HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
-        ModerationResponse moderationResponse = gson.fromJson(response.body(), ModerationResponse.class);
-        return moderationResponse;
+        return ModerationResponse.fromJson(response.body());
     }
 }
