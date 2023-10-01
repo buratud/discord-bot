@@ -45,7 +45,7 @@ public class ChatGptHttp {
     public ModerationResponse moderateMessage(String message) throws IOException, InterruptedException {
         ModerationRequest moderationRequest = new ModerationRequest();
         moderationRequest.input = message;
-        String jsonResult = moderationRequest.toString();
+        String jsonResult = moderationRequest.toJsonString();
 
         HttpClient client = HttpClient.newBuilder().build();
         HttpRequest request = HttpRequest.newBuilder()
