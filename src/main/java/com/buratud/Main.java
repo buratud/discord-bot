@@ -25,8 +25,12 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 public class Main extends ListenerAdapter {
+    private static final Logger logger = LogManager.getLogger(Main.class);
     private final MessageInteraction message;
     private final CommandInteraction command;
     private final ChatGPT chatGPT;
@@ -49,13 +53,11 @@ public class Main extends ListenerAdapter {
     }
 
     @Override
-    public void onMessageContextInteraction(MessageContextInteractionEvent event) {
+    public void onMessageContextInteraction(@NotNull MessageContextInteractionEvent event) {
         executor.submit(() -> {
             try {
                 switch (event.getName()) {
-                    case "OCR" -> {
-                        message.ocr(event);
-                    }
+                    case "OCR" -> message.ocr(event);
                 }
             } catch (Exception e) {
                 if (event.isAcknowledged()) {
@@ -63,22 +65,24 @@ public class Main extends ListenerAdapter {
                 } else {
                     event.reply("Something went wrong, try again later.").setEphemeral(true).queue();
                 }
-                e.printStackTrace();
+                logger.error(e);
             }
         });
     }
 
     @Override
-    public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         executor.submit(() -> {
             try {
                 switch (event.getName()) {
                     case "chatgpt" -> {
-                        String subName = event.getSubcommandName();
-                        switch (subName) {
-                            case "reset" -> {
-                                command.resetChatHistory(event);
+                        if (chatGPT != null) {
+                            String subName = event.getSubcommandName();
+                            switch (subName) {
+                                case "reset" -> command.resetChatHistory(event);
                             }
+                        } else {
+                            event.reply("Module is unavailable").queue();
                         }
                     }
                 }
@@ -88,7 +92,7 @@ public class Main extends ListenerAdapter {
                 } else {
                     event.reply("Something went wrong, try again later.").setEphemeral(true).queue();
                 }
-                e.printStackTrace();
+                logger.error(e);
             }
         });
     }
@@ -100,38 +104,40 @@ public class Main extends ListenerAdapter {
     }
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent event) {
-        executor.submit(() -> {
-            try {
-                if (event.getAuthor().isBot()) {
-                    return;
-                }
-                Message message = event.getMessage();
-                String rawMessage = message.getContentRaw();
-                if (message.getMentions().isMentioned(event.getJDA().getSelfUser())) {
-                    int pos = rawMessage.indexOf(String.format("<@%s>", event.getJDA().getSelfUser().getId()));
-                    int lastPos = rawMessage.indexOf('>', pos);
-                    rawMessage = rawMessage.substring(lastPos + 1).trim();
-                    String flagged = chatGPT.moderationCheck(rawMessage);
-                    if (flagged != null) {
-                        message.reply(flagged).queue();
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+        if (chatGPT != null) {
+            executor.submit(() -> {
+                try {
+                    if (event.getAuthor().isBot()) {
                         return;
                     }
-                    String res = chatGPT.send(event.getChannel().getId(), event.getAuthor().getId(), rawMessage);
-                    List<String> responses = splitResponse(res);
-                    for (String response : responses) {
-                        if (response.startsWith("```")) {
-                            message.replyFiles(convertToDiscordFile(response)).queue();
-                        } else {
-                            message.reply(response).queue();
+                    Message message = event.getMessage();
+                    String rawMessage = message.getContentRaw();
+                    if (message.getMentions().isMentioned(event.getJDA().getSelfUser())) {
+                        int pos = rawMessage.indexOf(String.format("<@%s>", event.getJDA().getSelfUser().getId()));
+                        int lastPos = rawMessage.indexOf('>', pos);
+                        rawMessage = rawMessage.substring(lastPos + 1).trim();
+                        String flagged = chatGPT.moderationCheck(rawMessage);
+                        if (flagged != null) {
+                            message.reply(flagged).queue();
+                            return;
+                        }
+                        String res = chatGPT.send(event.getChannel().getId(), event.getAuthor().getId(), rawMessage);
+                        List<String> responses = splitResponse(res);
+                        for (String response : responses) {
+                            if (response.startsWith("```")) {
+                                message.replyFiles(convertToDiscordFile(response)).queue();
+                            } else {
+                                message.reply(response).queue();
+                            }
                         }
                     }
+                } catch (IOException | InterruptedException e) {
+                    event.getMessage().reply("Something went wrong, try again later.").queue();
+                    logger.error(e);
                 }
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-                event.getMessage().reply("Something went wrong, try again later.").queue();
-            }
-        });
+            });
+        }
     }
 
     public static List<String> splitResponse(String response) {
@@ -139,10 +145,10 @@ public class Main extends ListenerAdapter {
         int strlen = response.length();
         int last_index = 0;
         boolean is_code = false;
-        if (last_index == -1) {
-            throw new IllegalArgumentException("Split response failed.");
-        }
         while (last_index < strlen) {
+            if (last_index == -1) {
+                throw new IllegalArgumentException("Split response failed.");
+            }
             if (is_code) {
                 int end = response.indexOf("```", last_index + 3);
                 if (end != -1) {
