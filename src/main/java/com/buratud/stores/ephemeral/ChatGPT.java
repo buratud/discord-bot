@@ -1,11 +1,10 @@
 package com.buratud.stores.ephemeral;
 
+import com.buratud.data.openai.chat.Message;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-
-import com.buratud.data.openai.chat.Message;
 
 public class ChatGPT implements com.buratud.stores.ChatGPT {
 
@@ -24,7 +23,7 @@ public class ChatGPT implements com.buratud.stores.ChatGPT {
     @Override
     public List<Message> create(String channelId, String userId) {
         if (!chat.containsKey(channelId)) {
-            chat.put(channelId, new HashMap<String, List<Message>>());
+            chat.put(channelId, new HashMap<>());
         }
         if (!chat.get(channelId).containsKey(userId)) {
             chat.get(channelId).put(userId, new ArrayList<>());
