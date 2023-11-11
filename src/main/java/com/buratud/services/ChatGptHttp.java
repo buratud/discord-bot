@@ -8,6 +8,7 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 
 import com.buratud.data.openai.chat.ChatCompletionRequest;
 import com.buratud.data.openai.chat.ChatCompletionResponse;
@@ -20,14 +21,13 @@ public class ChatGptHttp {
 
     private static final String chatUrl = "https://api.openai.com/v1/chat/completions";
     private static final String moderationUrl = "https://api.openai.com/v1/moderations";
-
+    private static final int timeoutSeconds = 5;
     public ChatGptHttp(String apiKey) {
         this.client = HttpClient.newBuilder().build();
         this.apiKey = apiKey;
     }
 
-    public ChatCompletionResponse sendChatCompletionRequest(ChatCompletionRequest body)
-            throws IOException, InterruptedException {
+    public ChatCompletionResponse sendChatCompletionRequest(ChatCompletionRequest body) throws IOException, InterruptedException {
 
         String requestBody = body.toJson();
         HttpRequest request = HttpRequest.newBuilder()
@@ -35,6 +35,7 @@ public class ChatGptHttp {
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + apiKey)
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
+                .timeout(Duration.ofSeconds(timeoutSeconds))
                 .build();
 
         HttpResponse<String> responseStr = client.send(request, BodyHandlers.ofString());
@@ -53,6 +54,7 @@ public class ChatGptHttp {
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + apiKey)
                 .POST(BodyPublishers.ofString(jsonResult))
+                .timeout(Duration.ofSeconds(timeoutSeconds))
                 .build();
 
         HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
