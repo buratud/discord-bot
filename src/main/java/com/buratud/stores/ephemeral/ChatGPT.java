@@ -1,6 +1,7 @@
 package com.buratud.stores.ephemeral;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class ChatGPT implements com.buratud.stores.ChatGPT {
     public List<Message> get(String channelId, String userId) {
         if (chat.containsKey(channelId)) {
             if (chat.get(channelId).containsKey(userId)) {
-                return chat.get(channelId).get(userId);
+                return List.copyOf(chat.get(channelId).get(userId));
             }
         }
         return null;
@@ -45,5 +46,6 @@ public class ChatGPT implements com.buratud.stores.ChatGPT {
 
     @Override
     public void save(String channelId, String userId, List<Message> message) {
+        chat.get(channelId).put(userId, message);
     }
 }
