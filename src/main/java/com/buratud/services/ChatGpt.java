@@ -46,7 +46,7 @@ public class ChatGpt {
             reset(channelId, userId);
         }
         info.history.add(new ChatMessage(Role.USER, message));
-        ChatCompletionRequest request = new ChatCompletionRequestBuilder(DEFAULT_MODEL, info.history).build();
+        ChatCompletionRequest request = new ChatCompletionRequestBuilder(info.model, info.history).build();
         ChatCompletionResponse response = client.sendChatCompletionRequest(request);
         String messageRes = response.choices.get(0).message.content;
         messageRes = messageRes.replace("\n\n", "\n");
@@ -61,7 +61,7 @@ public class ChatGpt {
             reset(channelId, userId);
         }
         info.history.add(new ChatMessage(Role.USER, message));
-        ChatCompletionRequest request = new ChatCompletionRequestBuilder(DEFAULT_MODEL, info.history).withStream(true).build();
+        ChatCompletionRequest request = new ChatCompletionRequestBuilder(info.model, info.history).withStream(true).build();
         EventStreamSubscriber subscriber = new EventStreamSubscriber();
         client.sendChatCompletionRequestWithStreamEnabled(request, subscriber);
         String messageRes = subscriber.getContent();
