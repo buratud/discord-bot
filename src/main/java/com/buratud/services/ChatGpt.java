@@ -1,5 +1,6 @@
 package com.buratud.services;
 
+import com.buratud.data.ChatGptChannelInfo;
 import com.buratud.data.openai.chat.*;
 import com.buratud.data.openai.moderation.ModerationResponse;
 import com.google.gson.Gson;
@@ -41,39 +42,39 @@ public class ChatGpt {
     }
 
     public String send(String channelId, String userId, String message) throws IOException, InterruptedException {
-        List<ChatMessage> history = store.get(channelId, userId);
-        if (history == null) {
-            history = store.create(channelId, userId);
+        ChatGptChannelInfo info = store.get(channelId, userId);
+        if (info == null) {
+            info = store.create(channelId, userId);
             if (system != null) {
-                history.add(system);
+                info.history.add(system);
             }
         }
-        history.add(new ChatMessage(Role.USER, message));
-        ChatCompletionRequest request = new ChatCompletionRequestBuilder(DEFAULT_MODEL, history).build();
+        info.history.add(new ChatMessage(Role.USER, message));
+        ChatCompletionRequest request = new ChatCompletionRequestBuilder(DEFAULT_MODEL, info.history).build();
         ChatCompletionResponse response = client.sendChatCompletionRequest(request);
         String messageRes = response.choices.get(0).message.content;
         messageRes = messageRes.replace("\n\n", "\n");
-        history.add(new ChatMessage(Role.ASSISTANT, messageRes));
-        store.save(channelId, userId, history);
+        info.history.add(new ChatMessage(Role.ASSISTANT, messageRes));
+        store.save(channelId, userId, info);
         return String.format("%s\n\nTotal tokens: %d", messageRes, response.usage.totalTokens);
     }
 
     public String sendStreamEnabled(String channelId, String userId, String message) throws InterruptedException, ExecutionException {
-        List<ChatMessage> history = store.get(channelId, userId);
-        if (history == null) {
-            history = store.create(channelId, userId);
+        ChatGptChannelInfo info = store.get(channelId, userId);
+        if (info == null) {
+            info = store.create(channelId, userId);
             if (system != null) {
-                history.add(system);
+                info.history.add(system);
             }
         }
-        history.add(new ChatMessage(Role.USER, message));
-        ChatCompletionRequest request = new ChatCompletionRequestBuilder(DEFAULT_MODEL, history).withStream(true).build();
+        info.history.add(new ChatMessage(Role.USER, message));
+        ChatCompletionRequest request = new ChatCompletionRequestBuilder(DEFAULT_MODEL, info.history).withStream(true).build();
         EventStreamSubscriber subscriber = new EventStreamSubscriber();
         client.sendChatCompletionRequestWithStreamEnabled(request, subscriber);
         String messageRes = subscriber.getContent();
         messageRes = messageRes.replace("\n\n", "\n");
-        history.add(new ChatMessage(Role.ASSISTANT, messageRes));
-        store.save(channelId, userId, history);
+        info.history.add(new ChatMessage(Role.ASSISTANT, messageRes));
+        store.save(channelId, userId, info);
         return String.format("%s", messageRes);
     }
 
@@ -90,16 +91,16 @@ public class ChatGpt {
     }
 
     public void reset(String channelId, String userId) {
-        List<ChatMessage> history = store.get(channelId, userId);
-        if (history == null) {
-            history = store.create(channelId, userId);
+        ChatGptChannelInfo info = store.get(channelId, userId);
+        if (info == null) {
+            info = store.create(channelId, userId);
         } else {
-            history = store.clear(channelId, userId);
+            info = store.clear(channelId, userId);
         }
         if (system != null) {
-            history.add(system);
+            info.history.add(system);
         }
-        store.save(channelId, userId, history);
+        store.save(channelId, userId, info);
     }
 
     class EventStreamSubscriber implements Flow.Subscriber<String> {
@@ -122,7 +123,7 @@ public class ChatGpt {
             }
             ChatCompletionResponse item = gson.fromJson(content, ChatCompletionResponse.class);
             if (item.choices.get(0).finishReason.equals("length")) {
-                builder.append("Message is cut due to exceed of token.");
+                builder.append("\nMessage is cut due to exceed of token.");
             }
             else if (item.choices.get(0).message.content != null)
                 builder.append(item.choices.get(0).message.content);

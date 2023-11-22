@@ -1,5 +1,6 @@
 package com.buratud.stores.ephemeral;
 
+import com.buratud.data.ChatGptChannelInfo;
 import com.buratud.data.openai.chat.ChatMessage;
 
 import java.util.ArrayList;
@@ -8,43 +9,43 @@ import java.util.List;
 
 public class ChatGpt implements com.buratud.stores.ChatGpt {
 
-    HashMap<String, HashMap<String, List<ChatMessage>>> chat = new HashMap<>();
+    HashMap<String, HashMap<String, ChatGptChannelInfo>> chat = new HashMap<>();
 
     @Override
-    public List<ChatMessage> get(String channelId, String userId) {
+    public ChatGptChannelInfo get(String channelId, String userId) {
         if (chat.containsKey(channelId)) {
             if (chat.get(channelId).containsKey(userId)) {
-                return List.copyOf(chat.get(channelId).get(userId));
+                return chat.get(channelId).get(userId);
             }
         }
         return null;
     }
 
     @Override
-    public List<ChatMessage> create(String channelId, String userId) {
+    public ChatGptChannelInfo create(String channelId, String userId) {
         if (!chat.containsKey(channelId)) {
             chat.put(channelId, new HashMap<>());
         }
         if (!chat.get(channelId).containsKey(userId)) {
-            chat.get(channelId).put(userId, new ArrayList<>());
+            chat.get(channelId).put(userId, new ChatGptChannelInfo("gpt-3.5-turbo"));
         }
         return chat.get(channelId).get(userId);
     }
 
     @Override
-    public List<ChatMessage> put(String channelId, String userId, ChatMessage message) {
-        List<ChatMessage> messages = chat.get(channelId).get(userId);
-        messages.add(message);
+    public ChatGptChannelInfo put(String channelId, String userId, ChatMessage message) {
+        ChatGptChannelInfo messages = chat.get(channelId).get(userId);
+        messages.history.add(message);
         return messages;
     }
 
     @Override
-    public List<ChatMessage> clear(String channelId, String userId) {
-        return chat.get(channelId).put(userId, new ArrayList<>());
+    public ChatGptChannelInfo clear(String channelId, String userId) {
+        return chat.get(channelId).put(userId, new ChatGptChannelInfo("gpt-3.5-turbo"));
     }
 
     @Override
-    public void save(String channelId, String userId, List<ChatMessage> message) {
+    public void save(String channelId, String userId, ChatGptChannelInfo message) {
         chat.get(channelId).put(userId, message);
     }
 }
