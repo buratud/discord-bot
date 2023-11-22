@@ -53,7 +53,7 @@ public final class ChatGpt implements Handler {
                         message.reply(flagged).queue();
                         return;
                     }
-                    String res = chatGPT.send(event.getChannel().getId(), event.getAuthor().getId(), rawMessage);
+                    String res = chatGPT.sendStreamEnabled(event.getChannel().getId(), event.getAuthor().getId(), rawMessage);
                     List<String> responses = splitResponse(res);
                     for (String response : responses) {
                         if (response.startsWith("```")) {
@@ -63,7 +63,7 @@ public final class ChatGpt implements Handler {
                         }
                     }
                 }
-            } catch (IOException | InterruptedException e) {
+            } catch (Exception  e) {
                 event.getMessage().reply("Something went wrong, try again later.").queue();
                 logger.error(e);
             }
