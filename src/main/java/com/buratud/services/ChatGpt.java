@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Flow;
@@ -102,6 +103,7 @@ public class ChatGpt {
         ChatGptChannelInfo info = store.get(channelId, userId);
         if (info == null) {
             info = reset(channelId, userId);
+            info.history = new ArrayList<>();
         }
         info.model = model;
     }
