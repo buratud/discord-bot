@@ -61,7 +61,7 @@ public class Main extends ListenerAdapter {
     @Override
     public void onReady(ReadyEvent event) {
         SelfUser user = event.getJDA().getSelfUser();
-        System.out.printf("Logged in as \"%s\"", user.getName());
+        logger.info("Logged in as {}", user.getName());
     }
 
     @Override
