@@ -43,7 +43,7 @@ public class ChatGpt {
     public String send(String channelId, String userId, String message) throws IOException, InterruptedException {
         ChatGptChannelInfo info = store.get(channelId, userId);
         if (info == null) {
-            reset(channelId, userId);
+            info = reset(channelId, userId);
         }
         info.history.add(new ChatMessage(Role.USER, message));
         ChatCompletionRequest request = new ChatCompletionRequestBuilder(info.model, info.history).build();
@@ -58,7 +58,7 @@ public class ChatGpt {
     public String sendStreamEnabled(String channelId, String userId, String message) throws InterruptedException, ExecutionException {
         ChatGptChannelInfo info = store.get(channelId, userId);
         if (info == null) {
-            reset(channelId, userId);
+            info = reset(channelId, userId);
         }
         info.history.add(new ChatMessage(Role.USER, message));
         ChatCompletionRequest request = new ChatCompletionRequestBuilder(info.model, info.history).withStream(true).build();
