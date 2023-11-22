@@ -108,7 +108,7 @@ public class ChatGpt {
         info.model = model;
     }
 
-    class EventStreamSubscriber implements Flow.Subscriber<String> {
+    public class EventStreamSubscriber implements Flow.Subscriber<String> {
         private static final Gson gson = new Gson();
         private StringBuilder builder;
         private Flow.Subscription subscription;
@@ -122,15 +122,16 @@ public class ChatGpt {
 
         @Override
         public void onNext(String content) {
+            logger.info(content);
             content = content.substring(content.indexOf(':') + 2);
             if (content.contentEquals("[DONE]")) {
                 return;
             }
-            ChatCompletionResponse item = gson.fromJson(content, ChatCompletionResponse.class);
-            if (item.choices.get(0).finishReason != null && item.choices.get(0).finishReason.equals("length")) {
+            ChatCompletionStreamResponse item = gson.fromJson(content, ChatCompletionStreamResponse.class);
+            if (item.choices[0].finishReason != null && item.choices[0].finishReason.equals("length")) {
                 builder.append("\nMessage is cut due to exceed of token.");
-            } else if (item.choices.get(0).message != null)
-                builder.append(item.choices.get(0).message.content);
+            } else if (item.choices[0].delta.content != null)
+                builder.append(item.choices[0].delta.content);
             subscription.request(1);
         }
 
@@ -144,6 +145,7 @@ public class ChatGpt {
         }
 
         public String getContent() {
+            logger.info(builder.toString());
             return builder.toString();
         }
     }
