@@ -1,10 +1,8 @@
 package com.buratud.interactions;
 
-import com.buratud.Main;
 import com.buratud.Service;
 import com.buratud.services.ComputerVision;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
-import org.apache.hc.core5.http.NotImplementedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;

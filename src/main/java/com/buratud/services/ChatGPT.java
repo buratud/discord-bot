@@ -1,25 +1,19 @@
 package com.buratud.services;
 
+import com.buratud.data.openai.chat.*;
+import com.buratud.data.openai.moderation.ModerationResponse;
+import com.google.gson.Gson;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
-import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Flow;
-
-import com.buratud.data.openai.chat.ChatCompletionRequest;
-import com.buratud.data.openai.chat.ChatCompletionRequestBuilder;
-import com.buratud.data.openai.chat.ChatCompletionResponse;
-import com.buratud.data.openai.chat.ChatMessage;
-import com.buratud.data.openai.chat.Role;
-import com.buratud.data.openai.moderation.ModerationResponse;
-import com.google.gson.Gson;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class ChatGPT {
     private static final Logger logger = LogManager.getLogger(ChatGPT.class);
@@ -64,7 +58,7 @@ public class ChatGPT {
         return String.format("%s\n\nTotal tokens: %d", messageRes, response.usage.totalTokens);
     }
 
-    public String sendStreamEnabled(String channelId, String userId, String message) throws IOException, InterruptedException, ExecutionException {
+    public String sendStreamEnabled(String channelId, String userId, String message) throws InterruptedException, ExecutionException {
         List<ChatMessage> history = store.get(channelId, userId);
         if (history == null) {
             history = store.create(channelId, userId);

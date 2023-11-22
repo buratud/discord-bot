@@ -15,7 +15,7 @@ public interface Handler {
         throw new NotImplementedException();
     }
 
-    default public void onMessageReceived(@NotNull MessageReceivedEvent event) throws NotImplementedException {
+    default void onMessageReceived(@NotNull MessageReceivedEvent event) throws NotImplementedException {
         throw new NotImplementedException();
     }
 }

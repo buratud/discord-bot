@@ -1,5 +1,10 @@
 package com.buratud.services;
 
+import com.buratud.data.openai.chat.ChatCompletionRequest;
+import com.buratud.data.openai.chat.ChatCompletionResponse;
+import com.buratud.data.openai.moderation.ModerationRequest;
+import com.buratud.data.openai.moderation.ModerationResponse;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -9,15 +14,9 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Flow;
-
-import com.buratud.data.openai.chat.ChatCompletionRequest;
-import com.buratud.data.openai.chat.ChatCompletionResponse;
-import com.buratud.data.openai.moderation.ModerationRequest;
-import com.buratud.data.openai.moderation.ModerationResponse;
 
 public class ChatGptHttp {
     private final HttpClient client;
@@ -46,7 +45,7 @@ public class ChatGptHttp {
         return ChatCompletionResponse.fromJson(responseStr.body());
     }
 
-    public CompletableFuture<HttpResponse<Object>> sendChatCompletionRequestWithStreamEnabled(ChatCompletionRequest body, Flow.Subscriber<? super String> subscriber) throws IOException, InterruptedException, ExecutionException {
+    public CompletableFuture<HttpResponse<Object>> sendChatCompletionRequestWithStreamEnabled(ChatCompletionRequest body, Flow.Subscriber<? super String> subscriber) throws InterruptedException, ExecutionException {
 
         String requestBody = body.toJson();
         HttpRequest request = HttpRequest.newBuilder()
