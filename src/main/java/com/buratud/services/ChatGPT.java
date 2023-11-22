@@ -116,13 +116,15 @@ public class ChatGPT {
 
         @Override
         public void onNext(String content) {
-
             content = content.substring(content.indexOf(':') + 2);
             if (content.contentEquals("[DONE]")) {
                 return;
             }
             ChatCompletionResponse item = gson.fromJson(content, ChatCompletionResponse.class);
-            if (item.choices.get(0).message.content != null)
+            if (item.choices.get(0).finishReason.equals("length")) {
+                builder.append("Message is cut due to exceed of token.");
+            }
+            else if (item.choices.get(0).message.content != null)
                 builder.append(item.choices.get(0).message.content);
             subscription.request(1);
         }
