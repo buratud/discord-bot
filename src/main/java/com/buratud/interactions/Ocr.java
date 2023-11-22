@@ -1,17 +1,26 @@
 package com.buratud.interactions;
 
-import java.io.IOException;
-
 import com.buratud.Service;
 import com.buratud.services.ComputerVision;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 
-public class MessageInteraction {
-    private final ComputerVision vision;
+import java.io.IOException;
 
-    public MessageInteraction() throws IOException {
+public class Ocr implements Handler {
+    private final ComputerVision vision;
+    private static Ocr instance;
+
+    public Ocr() throws IOException {
         Service service = Service.getInstance();
         vision = service.vision;
+    }
+
+    public static synchronized Ocr getInstance() throws IOException {
+        // Create the instance if it doesn't exist yet
+        if (instance == null) {
+            instance = new Ocr();
+        }
+        return instance;
     }
 
     public void ocr(MessageContextInteractionEvent event) throws IOException, InterruptedException {

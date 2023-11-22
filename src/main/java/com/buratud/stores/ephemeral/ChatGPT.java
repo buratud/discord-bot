@@ -1,6 +1,6 @@
 package com.buratud.stores.ephemeral;
 
-import com.buratud.data.openai.chat.Message;
+import com.buratud.data.openai.chat.ChatMessage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,10 +8,10 @@ import java.util.List;
 
 public class ChatGPT implements com.buratud.stores.ChatGPT {
 
-    HashMap<String, HashMap<String, List<Message>>> chat = new HashMap<>();
+    HashMap<String, HashMap<String, List<ChatMessage>>> chat = new HashMap<>();
 
     @Override
-    public List<Message> get(String channelId, String userId) {
+    public List<ChatMessage> get(String channelId, String userId) {
         if (chat.containsKey(channelId)) {
             if (chat.get(channelId).containsKey(userId)) {
                 return List.copyOf(chat.get(channelId).get(userId));
@@ -21,7 +21,7 @@ public class ChatGPT implements com.buratud.stores.ChatGPT {
     }
 
     @Override
-    public List<Message> create(String channelId, String userId) {
+    public List<ChatMessage> create(String channelId, String userId) {
         if (!chat.containsKey(channelId)) {
             chat.put(channelId, new HashMap<>());
         }
@@ -32,19 +32,19 @@ public class ChatGPT implements com.buratud.stores.ChatGPT {
     }
 
     @Override
-    public List<Message> put(String channelId, String userId, Message message) {
-        List<Message> messages = chat.get(channelId).get(userId);
+    public List<ChatMessage> put(String channelId, String userId, ChatMessage message) {
+        List<ChatMessage> messages = chat.get(channelId).get(userId);
         messages.add(message);
         return messages;
     }
 
     @Override
-    public List<Message> clear(String channelId, String userId) {
+    public List<ChatMessage> clear(String channelId, String userId) {
         return chat.get(channelId).put(userId, new ArrayList<>());
     }
 
     @Override
-    public void save(String channelId, String userId, List<Message> message) {
+    public void save(String channelId, String userId, List<ChatMessage> message) {
         chat.get(channelId).put(userId, message);
     }
 }

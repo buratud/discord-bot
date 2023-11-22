@@ -6,7 +6,7 @@ public class ChatCompletionRequestBuilder {
 
     private ChatCompletionRequest request;
 
-    public ChatCompletionRequestBuilder(String model, List<Message> messages) {
+    public ChatCompletionRequestBuilder(String model, List<ChatMessage> messages) {
         request = new ChatCompletionRequest();
         request.model = model;
         request.messages = messages;

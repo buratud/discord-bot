@@ -7,7 +7,7 @@ public class Choice {
     @Expose
     public int index;
     @Expose
-    public Message message;
+    public ChatMessage message;
     @Expose
     @SerializedName("finish_reason")
     public String finishReason;

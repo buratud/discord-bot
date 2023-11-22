@@ -14,7 +14,7 @@ public class ChatCompletionRequest {
 
     @Expose
     @SerializedName("messages")
-    public List<Message> messages;
+    public List<ChatMessage> messages;
 
     @Expose
     @SerializedName("temperature")

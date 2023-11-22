@@ -10,13 +10,13 @@ import java.util.Map;
 import com.buratud.data.openai.chat.ChatCompletionRequest;
 import com.buratud.data.openai.chat.ChatCompletionRequestBuilder;
 import com.buratud.data.openai.chat.ChatCompletionResponse;
-import com.buratud.data.openai.chat.Message;
+import com.buratud.data.openai.chat.ChatMessage;
 import com.buratud.data.openai.chat.Role;
 import com.buratud.data.openai.moderation.ModerationResponse;
 
 public class ChatGPT {
     private ChatGptHttp client;
-    private Message system;
+    private ChatMessage system;
     private com.buratud.stores.ChatGPT store;
     private static final String DEFAULT_MODEL = "gpt-3.5-turbo";
     private static final String SYSTEM_MESSAGE_FILE = "./system_message.txt";
@@ -33,25 +33,25 @@ public class ChatGPT {
         if (Files.exists(path)) {
             String content = Files.readString(path);
             if (!content.isEmpty()) {
-                system = new Message(Role.SYSTEM, content);
+                system = new ChatMessage(Role.SYSTEM, content);
             }
         }
     }
 
     public String send(String channelId, String userId, String message) throws IOException, InterruptedException {
-        List<Message> history = store.get(channelId, userId);
+        List<ChatMessage> history = store.get(channelId, userId);
         if (history == null) {
             history = store.create(channelId, userId);
             if (system != null) {
                 history.add(system);
             }
         }
-        history.add(new Message(Role.USER, message));
+        history.add(new ChatMessage(Role.USER, message));
         ChatCompletionRequest request = new ChatCompletionRequestBuilder(DEFAULT_MODEL, history).build();
         ChatCompletionResponse response = client.sendChatCompletionRequest(request);
         String messageRes = response.choices.get(0).message.content;
         messageRes = messageRes.replace("\n\n", "\n");
-        history.add(new Message(Role.ASSISTANT, messageRes));
+        history.add(new ChatMessage(Role.ASSISTANT, messageRes));
         store.save(channelId, userId, history);
         return String.format("%s\n\nTotal tokens: %d", messageRes, response.usage.totalTokens);
     }
@@ -69,7 +69,7 @@ public class ChatGPT {
     }
 
     public void reset(String channelId, String userId) {
-        List<Message> history = store.get(channelId, userId);
+        List<ChatMessage> history = store.get(channelId, userId);
         if (history == null) {
             history = store.create(channelId, userId);
         } else {

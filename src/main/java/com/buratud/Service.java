@@ -22,13 +22,9 @@ public class Service {
         vision = new ComputerVision(Env.AZURE_VISION_ENDPOINT, Env.AZURE_VISION_KEY);
     }
 
-    public static Service getInstance() throws IOException {
+    public static synchronized Service getInstance() throws IOException {
         if (instance == null) {
-            synchronized (Service.class) {
-                if (instance == null) {
-                    instance = new Service();
-                }
-            }
+            instance = new Service();
         }
         return instance;
     }
