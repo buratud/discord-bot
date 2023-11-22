@@ -129,7 +129,7 @@ public class ChatGpt {
             ChatCompletionResponse item = gson.fromJson(content, ChatCompletionResponse.class);
             if (item.choices.get(0).finishReason != null && item.choices.get(0).finishReason.equals("length")) {
                 builder.append("\nMessage is cut due to exceed of token.");
-            } else if (item.choices.get(0).message.content != null)
+            } else if (item.choices.get(0).message != null)
                 builder.append(item.choices.get(0).message.content);
             subscription.request(1);
         }
