@@ -15,7 +15,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.apache.logging.log4j.LogManager;
@@ -37,7 +39,17 @@ public class Main extends ListenerAdapter {
     public static void main(String[] args) throws InterruptedException, IOException {
         JDA jda = JDABuilder.createDefault(Env.DISCORD_TOKEN).enableIntents(GatewayIntent.MESSAGE_CONTENT).addEventListeners(new Main()).build();
         jda.awaitReady();
-        jda.updateCommands().addCommands(Commands.message("OCR"), Commands.slash("chatgpt", "ChatGPT related command.").addSubcommands(new SubcommandData("reset", "Reset chat history."))).queue();
+        jda.updateCommands().addCommands(
+                        Commands.message("OCR"),
+                        Commands.slash("chatgpt", "ChatGPT related command.")
+                                .addSubcommands(new SubcommandData("reset", "Reset chat history.")
+                                        .addOptions(new OptionData(OptionType.STRING, "model", "Set model")
+                                                .addChoice("gpt-3.5-turbo-1106", "gpt-3.5-turbo-1106")
+                                                .addChoice("gpt-4-1106-preview", "gpt-4-1106-preview")
+                                        )
+                                )
+                )
+                .queue();
     }
 
     @Override

@@ -14,17 +14,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public final class ChatGpt implements Handler {
     private static final Logger logger = LogManager.getLogger(ChatGpt.class);
     private static ChatGpt instance;
-    private final com.buratud.services.ChatGpt chatGPT;
+    private final com.buratud.services.ChatGpt chatGpt;
     private final HashMap<String, String> fileExtMap;
 
     private ChatGpt() throws IOException {
         Service service = Service.getInstance();
         fileExtMap = createFileExtensionMap();
-        chatGPT = service.chatgpt;
+        chatGpt = service.chatgpt;
     }
 
     public static synchronized ChatGpt getInstance() throws IOException {
@@ -37,7 +38,7 @@ public final class ChatGpt implements Handler {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        if (chatGPT != null) {
+        if (chatGpt != null) {
             try {
                 if (event.getAuthor().isBot()) {
                     return;
@@ -48,12 +49,12 @@ public final class ChatGpt implements Handler {
                     int pos = rawMessage.indexOf(String.format("<@%s>", event.getJDA().getSelfUser().getId()));
                     int lastPos = rawMessage.indexOf('>', pos);
                     rawMessage = rawMessage.substring(lastPos + 1).trim();
-                    String flagged = chatGPT.moderationCheck(rawMessage);
+                    String flagged = chatGpt.moderationCheck(rawMessage);
                     if (flagged != null) {
                         message.reply(flagged).queue();
                         return;
                     }
-                    String res = chatGPT.sendStreamEnabled(event.getChannel().getId(), event.getAuthor().getId(), rawMessage);
+                    String res = chatGpt.sendStreamEnabled(event.getChannel().getId(), event.getAuthor().getId(), rawMessage);
                     List<String> responses = splitResponse(res);
                     for (String response : responses) {
                         if (response.startsWith("```")) {
@@ -63,7 +64,7 @@ public final class ChatGpt implements Handler {
                         }
                     }
                 }
-            } catch (Exception  e) {
+            } catch (Exception e) {
                 event.getMessage().reply("Something went wrong, try again later.").queue();
                 logger.error(e);
             }
@@ -72,20 +73,40 @@ public final class ChatGpt implements Handler {
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-        if (chatGPT != null) {
-            String subName = event.getSubcommandName();
-            switch (subName) {
-                case "reset" -> resetChatHistory(event);
+        try {
+            if (chatGpt != null) {
+                String subName = event.getSubcommandName();
+                switch (subName) {
+                    case "reset" -> resetChatHistory(event);
+                    case "switch" -> switchModel(event);
+                }
+            } else {
+                event.reply("Module is unavailable").queue();
             }
-        } else {
-            event.reply("Module is unavailable").queue();
+
+        } catch (Exception e) {
+            logger.error(e);
+            if (event.isAcknowledged()) {
+                event.getHook().sendMessage("Something went wrong, try again later.").queue();
+            } else {
+                event.reply("Something went wrong, try again later.").setEphemeral(true).queue();
+            }
         }
+
+    }
+
+    private void switchModel(SlashCommandInteractionEvent event) throws ExecutionException, InterruptedException {
+        String channelId = event.getMessageChannel().getId();
+        String userId = event.getMember().getId();
+        String model = event.getOption("model").getAsString();
+        chatGpt.SwitchModel(channelId, userId, model);
+        event.reply(String.format("Switched to %s model.", model)).queue();
     }
 
     private void resetChatHistory(SlashCommandInteractionEvent event) {
         String channelId = event.getMessageChannel().getId();
         String userId = event.getMember().getId();
-        chatGPT.reset(channelId, userId);
+        chatGpt.reset(channelId, userId);
         event.reply("Chat history reset.").queue();
     }
 

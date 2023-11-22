@@ -21,7 +21,7 @@ public class ChatGpt {
     private final ChatGptHttp client;
     private ChatMessage system;
     private final com.buratud.stores.ChatGpt store;
-    private static final String DEFAULT_MODEL = "gpt-3.5-turbo";
+    private static final String DEFAULT_MODEL = "gpt-3.5-turbo-1106";
     private static final String SYSTEM_MESSAGE_FILE = "./system_message.txt";
 
     public ChatGpt(String key) throws IOException {
@@ -44,10 +44,7 @@ public class ChatGpt {
     public String send(String channelId, String userId, String message) throws IOException, InterruptedException {
         ChatGptChannelInfo info = store.get(channelId, userId);
         if (info == null) {
-            info = store.create(channelId, userId);
-            if (system != null) {
-                info.history.add(system);
-            }
+            reset(channelId, userId);
         }
         info.history.add(new ChatMessage(Role.USER, message));
         ChatCompletionRequest request = new ChatCompletionRequestBuilder(DEFAULT_MODEL, info.history).build();
@@ -62,10 +59,7 @@ public class ChatGpt {
     public String sendStreamEnabled(String channelId, String userId, String message) throws InterruptedException, ExecutionException {
         ChatGptChannelInfo info = store.get(channelId, userId);
         if (info == null) {
-            info = store.create(channelId, userId);
-            if (system != null) {
-                info.history.add(system);
-            }
+            reset(channelId, userId);
         }
         info.history.add(new ChatMessage(Role.USER, message));
         ChatCompletionRequest request = new ChatCompletionRequestBuilder(DEFAULT_MODEL, info.history).withStream(true).build();
@@ -90,7 +84,7 @@ public class ChatGpt {
         return null;
     }
 
-    public void reset(String channelId, String userId) {
+    public ChatGptChannelInfo reset(String channelId, String userId) {
         ChatGptChannelInfo info = store.get(channelId, userId);
         if (info == null) {
             info = store.create(channelId, userId);
@@ -100,7 +94,17 @@ public class ChatGpt {
         if (system != null) {
             info.history.add(system);
         }
+        info.model = DEFAULT_MODEL;
         store.save(channelId, userId, info);
+        return info;
+    }
+
+    public void SwitchModel(String channelId, String userId, String model) {
+        ChatGptChannelInfo info = store.get(channelId, userId);
+        if (info == null) {
+            info = reset(channelId, userId);
+        }
+        info.model = model;
     }
 
     class EventStreamSubscriber implements Flow.Subscriber<String> {
