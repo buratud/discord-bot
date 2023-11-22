@@ -9,6 +9,10 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Flow;
 
 import com.buratud.data.openai.chat.ChatCompletionRequest;
 import com.buratud.data.openai.chat.ChatCompletionResponse;
@@ -40,6 +44,23 @@ public class ChatGptHttp {
         HttpResponse<String> responseStr = client.send(request, BodyHandlers.ofString());
 
         return ChatCompletionResponse.fromJson(responseStr.body());
+    }
+
+    public CompletableFuture<HttpResponse<Object>> sendChatCompletionRequestWithStreamEnabled(ChatCompletionRequest body, Flow.Subscriber<? super String> subscriber) throws IOException, InterruptedException, ExecutionException {
+
+        String requestBody = body.toJson();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(chatUrl))
+                .timeout(Duration.ofSeconds(5))
+                .header("Accept", "text/event-stream")
+                .header("Authorization", "Bearer " + apiKey)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
+                .build();
+
+        CompletableFuture<HttpResponse<Object>> responseFuture = client.sendAsync(request, HttpResponse.BodyHandlers.fromLineSubscriber(subscriber, s -> null, "\n\n"));
+        responseFuture.get();
+        return responseFuture;
     }
 
     public ModerationResponse moderateMessage(String message) throws IOException, InterruptedException {

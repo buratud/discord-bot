@@ -1,11 +1,15 @@
 package com.buratud.services;
 
 import java.io.IOException;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Flow;
 
 import com.buratud.data.openai.chat.ChatCompletionRequest;
 import com.buratud.data.openai.chat.ChatCompletionRequestBuilder;
@@ -13,8 +17,12 @@ import com.buratud.data.openai.chat.ChatCompletionResponse;
 import com.buratud.data.openai.chat.ChatMessage;
 import com.buratud.data.openai.chat.Role;
 import com.buratud.data.openai.moderation.ModerationResponse;
+import com.google.gson.Gson;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ChatGPT {
+    private static final Logger logger = LogManager.getLogger(ChatGPT.class);
     private final ChatGptHttp client;
     private ChatMessage system;
     private final com.buratud.stores.ChatGPT store;
@@ -56,6 +64,25 @@ public class ChatGPT {
         return String.format("%s\n\nTotal tokens: %d", messageRes, response.usage.totalTokens);
     }
 
+    public String sendStreamEnabled(String channelId, String userId, String message) throws IOException, InterruptedException, ExecutionException {
+        List<ChatMessage> history = store.get(channelId, userId);
+        if (history == null) {
+            history = store.create(channelId, userId);
+            if (system != null) {
+                history.add(system);
+            }
+        }
+        history.add(new ChatMessage(Role.USER, message));
+        ChatCompletionRequest request = new ChatCompletionRequestBuilder(DEFAULT_MODEL, history).withStream(true).build();
+        EventStreamSubscriber subscriber = new EventStreamSubscriber();
+        client.sendChatCompletionRequestWithStreamEnabled(request, subscriber);
+        String messageRes = subscriber.getContent();
+        messageRes = messageRes.replace("\n\n", "\n");
+        history.add(new ChatMessage(Role.ASSISTANT, messageRes));
+        store.save(channelId, userId, history);
+        return String.format("%s", messageRes);
+    }
+
     public String moderationCheck(String message) throws IOException, InterruptedException {
         ModerationResponse response = client.moderateMessage(message);
         if (response.results.get(0).flagged) {
@@ -79,5 +106,44 @@ public class ChatGPT {
             history.add(system);
         }
         store.save(channelId, userId, history);
+    }
+
+    class EventStreamSubscriber implements Flow.Subscriber<String> {
+        private static final Gson gson = new Gson();
+        private StringBuilder builder;
+        private Flow.Subscription subscription;
+
+        @Override
+        public void onSubscribe(Flow.Subscription subscription) {
+            this.subscription = subscription;
+            this.builder = new StringBuilder();
+            subscription.request(1);
+        }
+
+        @Override
+        public void onNext(String content) {
+
+            content = content.substring(content.indexOf(':') + 2);
+            if (content.contentEquals("[DONE]")) {
+                return;
+            }
+            ChatCompletionResponse item = gson.fromJson(content, ChatCompletionResponse.class);
+            if (item.choices.get(0).message.content != null)
+                builder.append(item.choices.get(0).message.content);
+            subscription.request(1);
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            logger.error(throwable);
+        }
+
+        @Override
+        public void onComplete() {
+        }
+
+        public String getContent() {
+            return builder.toString();
+        }
     }
 }
