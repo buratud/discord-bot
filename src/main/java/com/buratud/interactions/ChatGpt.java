@@ -79,6 +79,7 @@ public final class ChatGpt implements Handler {
                 switch (subName) {
                     case "reset" -> resetChatHistory(event);
                     case "model" -> switchModel(event);
+                    default -> event.reply("Subcommand doesn't exist.").queue();
                 }
             } else {
                 event.reply("Module is unavailable").queue();
