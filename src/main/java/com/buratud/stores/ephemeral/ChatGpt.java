@@ -27,7 +27,7 @@ public class ChatGpt implements com.buratud.stores.ChatGpt {
             chat.put(channelId, new HashMap<>());
         }
         if (!chat.get(channelId).containsKey(userId)) {
-            chat.get(channelId).put(userId, new ChatGptChannelInfo("gpt-3.5-turbo"));
+            chat.get(channelId).put(userId, new ChatGptChannelInfo());
         }
         return chat.get(channelId).get(userId);
     }
@@ -41,7 +41,7 @@ public class ChatGpt implements com.buratud.stores.ChatGpt {
 
     @Override
     public ChatGptChannelInfo clear(String channelId, String userId) {
-        return chat.get(channelId).put(userId, new ChatGptChannelInfo("gpt-3.5-turbo"));
+        return chat.get(channelId).put(userId, new ChatGptChannelInfo());
     }
 
     @Override
