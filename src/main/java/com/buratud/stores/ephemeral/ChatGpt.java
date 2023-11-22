@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ChatGPT implements com.buratud.stores.ChatGPT {
+public class ChatGpt implements com.buratud.stores.ChatGpt {
 
     HashMap<String, HashMap<String, List<ChatMessage>>> chat = new HashMap<>();
 

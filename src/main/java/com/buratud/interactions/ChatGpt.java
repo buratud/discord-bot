@@ -18,7 +18,7 @@ import java.util.List;
 public final class ChatGpt implements Handler {
     private static final Logger logger = LogManager.getLogger(ChatGpt.class);
     private static ChatGpt instance;
-    private final com.buratud.services.ChatGPT chatGPT;
+    private final com.buratud.services.ChatGpt chatGPT;
     private final HashMap<String, String> fileExtMap;
 
     private ChatGpt() throws IOException {

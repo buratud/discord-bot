@@ -15,17 +15,17 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Flow;
 
-public class ChatGPT {
-    private static final Logger logger = LogManager.getLogger(ChatGPT.class);
+public class ChatGpt {
+    private static final Logger logger = LogManager.getLogger(ChatGpt.class);
     private final ChatGptHttp client;
     private ChatMessage system;
-    private final com.buratud.stores.ChatGPT store;
+    private final com.buratud.stores.ChatGpt store;
     private static final String DEFAULT_MODEL = "gpt-3.5-turbo";
     private static final String SYSTEM_MESSAGE_FILE = "./system_message.txt";
 
-    public ChatGPT(String key) throws IOException {
+    public ChatGpt(String key) throws IOException {
         client = new ChatGptHttp(key);
-        store = new com.buratud.stores.ephemeral.ChatGPT();
+        store = new com.buratud.stores.ephemeral.ChatGpt();
         readSystemMessage();
     }
 

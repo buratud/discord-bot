@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.buratud.data.openai.chat.ChatMessage;
 
-public interface ChatGPT {
+public interface ChatGpt {
     List<ChatMessage> get(String channelId, String userId);
 
     List<ChatMessage> create(String channelId, String userId);
