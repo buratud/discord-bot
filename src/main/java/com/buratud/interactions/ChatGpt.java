@@ -84,7 +84,6 @@ public final class ChatGpt implements Handler {
             } else {
                 event.reply("Module is unavailable").queue();
             }
-
         } catch (Exception e) {
             logger.error(e);
             if (event.isAcknowledged()) {

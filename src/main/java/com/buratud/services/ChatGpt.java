@@ -91,10 +91,11 @@ public class ChatGpt {
         } else {
             info = store.clear(channelId, userId);
         }
+        info.model = DEFAULT_MODEL;
+        info.history = new ArrayList<>();
         if (system != null) {
             info.history.add(system);
         }
-        info.model = DEFAULT_MODEL;
         store.save(channelId, userId, info);
         return info;
     }
@@ -103,7 +104,6 @@ public class ChatGpt {
         ChatGptChannelInfo info = store.get(channelId, userId);
         if (info == null) {
             info = reset(channelId, userId);
-            info.history = new ArrayList<>();
         }
         info.model = model;
     }
