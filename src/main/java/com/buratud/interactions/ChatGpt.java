@@ -92,7 +92,6 @@ public final class ChatGpt implements Handler {
                 event.reply("Something went wrong, try again later.").setEphemeral(true).queue();
             }
         }
-
     }
 
     private void switchModel(SlashCommandInteractionEvent event) throws ExecutionException, InterruptedException {
