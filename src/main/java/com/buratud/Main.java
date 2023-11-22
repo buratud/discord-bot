@@ -43,17 +43,8 @@ public class Main extends ListenerAdapter {
     @Override
     public void onMessageContextInteraction(@NotNull MessageContextInteractionEvent event) {
         executor.submit(() -> {
-            try {
-                switch (event.getName()) {
-                    case "OCR" -> ocr.onMessageContextInteraction(event);
-                }
-            } catch (Exception e) {
-                if (event.isAcknowledged()) {
-                    event.getHook().sendMessage("Something went wrong, try again later.").queue();
-                } else {
-                    event.reply("Something went wrong, try again later.").setEphemeral(true).queue();
-                }
-                logger.error(e);
+            switch (event.getName()) {
+                case "OCR" -> ocr.onMessageContextInteraction(event);
             }
         });
     }
@@ -61,17 +52,8 @@ public class Main extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         executor.submit(() -> {
-            try {
-                switch (event.getName()) {
-                    case "chatgpt" -> chatGPT.onSlashCommandInteraction(event);
-                }
-            } catch (Exception e) {
-                if (event.isAcknowledged()) {
-                    event.getHook().sendMessage("Something went wrong, try again later.").queue();
-                } else {
-                    event.reply("Something went wrong, try again later.").setEphemeral(true).queue();
-                }
-                logger.error(e);
+            switch (event.getName()) {
+                case "chatgpt" -> chatGPT.onSlashCommandInteraction(event);
             }
         });
     }

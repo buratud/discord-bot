@@ -15,9 +15,9 @@ import com.buratud.data.openai.chat.Role;
 import com.buratud.data.openai.moderation.ModerationResponse;
 
 public class ChatGPT {
-    private ChatGptHttp client;
+    private final ChatGptHttp client;
     private ChatMessage system;
-    private com.buratud.stores.ChatGPT store;
+    private final com.buratud.stores.ChatGPT store;
     private static final String DEFAULT_MODEL = "gpt-3.5-turbo";
     private static final String SYSTEM_MESSAGE_FILE = "./system_message.txt";
 

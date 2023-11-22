@@ -38,35 +38,35 @@ public final class ChatGpt implements Handler {
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (chatGPT != null) {
-                try {
-                    if (event.getAuthor().isBot()) {
+            try {
+                if (event.getAuthor().isBot()) {
+                    return;
+                }
+                Message message = event.getMessage();
+                String rawMessage = message.getContentRaw();
+                if (message.getMentions().isMentioned(event.getJDA().getSelfUser())) {
+                    int pos = rawMessage.indexOf(String.format("<@%s>", event.getJDA().getSelfUser().getId()));
+                    int lastPos = rawMessage.indexOf('>', pos);
+                    rawMessage = rawMessage.substring(lastPos + 1).trim();
+                    String flagged = chatGPT.moderationCheck(rawMessage);
+                    if (flagged != null) {
+                        message.reply(flagged).queue();
                         return;
                     }
-                    Message message = event.getMessage();
-                    String rawMessage = message.getContentRaw();
-                    if (message.getMentions().isMentioned(event.getJDA().getSelfUser())) {
-                        int pos = rawMessage.indexOf(String.format("<@%s>", event.getJDA().getSelfUser().getId()));
-                        int lastPos = rawMessage.indexOf('>', pos);
-                        rawMessage = rawMessage.substring(lastPos + 1).trim();
-                        String flagged = chatGPT.moderationCheck(rawMessage);
-                        if (flagged != null) {
-                            message.reply(flagged).queue();
-                            return;
-                        }
-                        String res = chatGPT.send(event.getChannel().getId(), event.getAuthor().getId(), rawMessage);
-                        List<String> responses = splitResponse(res);
-                        for (String response : responses) {
-                            if (response.startsWith("```")) {
-                                message.replyFiles(convertToDiscordFile(response)).queue();
-                            } else {
-                                message.reply(response).queue();
-                            }
+                    String res = chatGPT.send(event.getChannel().getId(), event.getAuthor().getId(), rawMessage);
+                    List<String> responses = splitResponse(res);
+                    for (String response : responses) {
+                        if (response.startsWith("```")) {
+                            message.replyFiles(convertToDiscordFile(response)).queue();
+                        } else {
+                            message.reply(response).queue();
                         }
                     }
-                } catch (IOException | InterruptedException e) {
-                    event.getMessage().reply("Something went wrong, try again later.").queue();
-                    logger.error(e);
                 }
+            } catch (IOException | InterruptedException e) {
+                event.getMessage().reply("Something went wrong, try again later.").queue();
+                logger.error(e);
+            }
         }
     }
 
