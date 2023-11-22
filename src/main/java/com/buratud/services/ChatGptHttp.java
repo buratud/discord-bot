@@ -47,8 +47,6 @@ public class ChatGptHttp {
         ModerationRequest moderationRequest = new ModerationRequest();
         moderationRequest.input = message;
         String jsonResult = moderationRequest.toJsonString();
-
-        HttpClient client = HttpClient.newBuilder().build();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(moderationUrl))
                 .header("Content-Type", "application/json")
@@ -56,7 +54,6 @@ public class ChatGptHttp {
                 .POST(BodyPublishers.ofString(jsonResult))
                 .timeout(Duration.ofSeconds(timeoutSeconds))
                 .build();
-
         HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
         return ModerationResponse.fromJson(response.body());
     }
