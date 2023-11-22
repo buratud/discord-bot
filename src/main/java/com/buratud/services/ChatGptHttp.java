@@ -35,7 +35,6 @@ public class ChatGptHttp {
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + apiKey)
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
-                .timeout(Duration.ofSeconds(timeoutSeconds))
                 .build();
 
         HttpResponse<String> responseStr = client.send(request, BodyHandlers.ofString());
