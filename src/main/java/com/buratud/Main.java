@@ -42,11 +42,12 @@ public class Main extends ListenerAdapter {
         jda.updateCommands().addCommands(
                         Commands.message("OCR"),
                         Commands.slash("chatgpt", "ChatGPT related command.")
-                                .addSubcommands(new SubcommandData("reset", "Reset chat history.")
-                                        .addOptions(new OptionData(OptionType.STRING, "model", "Set model")
-                                                .addChoice("gpt-3.5-turbo-1106", "gpt-3.5-turbo-1106")
-                                                .addChoice("gpt-4-1106-preview", "gpt-4-1106-preview")
-                                        )
+                                .addSubcommands(new SubcommandData("reset", "Reset chat history."),
+                                        new SubcommandData("model", "Switch model.")
+                                                .addOptions(new OptionData(OptionType.STRING, "model", "Set model")
+                                                        .addChoice("gpt-3.5-turbo-1106", "gpt-3.5-turbo-1106")
+                                                        .addChoice("gpt-4-1106-preview", "gpt-4-1106-preview")
+                                                )
                                 )
                 )
                 .queue();
