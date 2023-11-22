@@ -41,6 +41,10 @@ public class ChatGpt {
         }
     }
 
+    public ChatGptChannelInfo getInfo(String channelId, String userId) {
+        return store.get(channelId, userId);
+    }
+
     public String send(String channelId, String userId, String message) throws IOException, InterruptedException {
         ChatGptChannelInfo info = store.get(channelId, userId);
         if (info == null) {
@@ -86,12 +90,15 @@ public class ChatGpt {
 
     public ChatGptChannelInfo reset(String channelId, String userId) {
         ChatGptChannelInfo info = store.get(channelId, userId);
+        boolean activated = false;
         if (info == null) {
             info = store.create(channelId, userId);
         } else {
+            activated = info.activated;
             info = store.clear(channelId, userId);
         }
         info.model = DEFAULT_MODEL;
+        info.activated = activated;
         info.history = new ArrayList<>();
         if (system != null) {
             info.history.add(system);
@@ -106,6 +113,14 @@ public class ChatGpt {
             info = reset(channelId, userId);
         }
         info.model = model;
+    }
+
+    public void SetActivation(String channelId, String userId, Boolean activation) {
+        ChatGptChannelInfo info = store.get(channelId, userId);
+        if (info == null) {
+            info = reset(channelId, userId);
+        }
+        info.activated = activation;
     }
 
     public class EventStreamSubscriber implements Flow.Subscriber<String> {

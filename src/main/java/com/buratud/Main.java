@@ -40,18 +40,21 @@ public class Main extends ListenerAdapter {
         JDA jda = JDABuilder.createDefault(Env.DISCORD_TOKEN).enableIntents(GatewayIntent.MESSAGE_CONTENT).addEventListeners(new Main()).build();
         jda.awaitReady();
         jda.updateCommands().addCommands(
-                        Commands.message("OCR"),
-                        Commands.slash("chatgpt", "ChatGPT related command.")
-                                .addSubcommands(new SubcommandData("reset", "Reset chat history."),
-                                        new SubcommandData("model", "Switch model.")
-                                                .addOptions(new OptionData(OptionType.STRING, "model", "Set model")
-                                                        .addChoice("gpt-3.5-turbo-1106", "gpt-3.5-turbo-1106")
-                                                        .addChoice("gpt-4-1106-preview", "gpt-4-1106-preview")
-                                                        .setRequired(true)
-                                                )
-                                )
-                )
-                .queue();
+                Commands.message("OCR"),
+                Commands.slash("chatgpt", "ChatGPT related command.")
+                        .addSubcommands(new SubcommandData("reset", "Reset chat history."),
+                                new SubcommandData("model", "Switch model.")
+                                        .addOptions(new OptionData(OptionType.STRING, "model", "Set model")
+                                                .addChoice("gpt-3.5-turbo-1106", "gpt-3.5-turbo-1106")
+                                                .addChoice("gpt-4-1106-preview", "gpt-4-1106-preview")
+                                                .setRequired(true)
+                                        ),
+                                new SubcommandData("activation", "Set activation for continuous use.")
+                                        .addOptions(new OptionData(OptionType.BOOLEAN, "activate", "Set whether to continuously use.")
+                                                .setRequired(true)
+                                        )
+                        )
+        ).queue();
     }
 
     @Override

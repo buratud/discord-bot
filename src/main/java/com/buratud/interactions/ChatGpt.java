@@ -1,6 +1,7 @@
 package com.buratud.interactions;
 
 import com.buratud.Service;
+import com.buratud.data.ChatGptChannelInfo;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -45,16 +46,21 @@ public final class ChatGpt implements Handler {
                 }
                 Message message = event.getMessage();
                 String rawMessage = message.getContentRaw();
-                if (message.getMentions().isMentioned(event.getJDA().getSelfUser())) {
-                    int pos = rawMessage.indexOf(String.format("<@%s>", event.getJDA().getSelfUser().getId()));
-                    int lastPos = rawMessage.indexOf('>', pos);
-                    rawMessage = rawMessage.substring(lastPos + 1).trim();
+                String channelId = event.getChannel().getId();
+                String userId = event.getAuthor().getId();
+                ChatGptChannelInfo info = chatGpt.getInfo(channelId, userId);
+                if (message.getMentions().isMentioned(event.getJDA().getSelfUser()) || info.activated) {
+                    if (message.getMentions().isMentioned(event.getJDA().getSelfUser())) {
+                        int pos = rawMessage.indexOf(String.format("<@%s>", event.getJDA().getSelfUser().getId()));
+                        int lastPos = rawMessage.indexOf('>', pos);
+                        rawMessage = rawMessage.substring(lastPos + 1).trim();
+                    }
                     String flagged = chatGpt.moderationCheck(rawMessage);
                     if (flagged != null) {
                         message.reply(flagged).queue();
                         return;
                     }
-                    String res = chatGpt.sendStreamEnabled(event.getChannel().getId(), event.getAuthor().getId(), rawMessage);
+                    String res = chatGpt.sendStreamEnabled(channelId, userId, rawMessage);
                     List<String> responses = splitResponse(res);
                     for (String response : responses) {
                         if (response.startsWith("```")) {
@@ -79,6 +85,7 @@ public final class ChatGpt implements Handler {
                 switch (subName) {
                     case "reset" -> resetChatHistory(event);
                     case "model" -> switchModel(event);
+                    case "activation" -> activate(event);
                     default -> event.reply("Subcommand doesn't exist.").queue();
                 }
             } else {
@@ -91,6 +98,18 @@ public final class ChatGpt implements Handler {
             } else {
                 event.reply("Something went wrong, try again later.").setEphemeral(true).queue();
             }
+        }
+    }
+
+    private void activate(SlashCommandInteractionEvent event) {
+        String channelId = event.getMessageChannel().getId();
+        String userId = event.getMember().getId();
+        Boolean activation = event.getOption("activate").getAsBoolean();
+        chatGpt.SetActivation(channelId, userId, activation);
+        if (activation) {
+            event.reply("Activated.").queue();
+        } else {
+            event.reply("Deactivated.").queue();
         }
     }
 
