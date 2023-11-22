@@ -78,7 +78,7 @@ public final class ChatGpt implements Handler {
                 String subName = event.getSubcommandName();
                 switch (subName) {
                     case "reset" -> resetChatHistory(event);
-                    case "switch" -> switchModel(event);
+                    case "model" -> switchModel(event);
                 }
             } else {
                 event.reply("Module is unavailable").queue();
