@@ -10,11 +10,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 public final class ChatGpt implements Handler {
@@ -55,6 +60,7 @@ public final class ChatGpt implements Handler {
                         int lastPos = rawMessage.indexOf('>', pos);
                         rawMessage = rawMessage.substring(lastPos + 1).trim();
                     }
+                    rawMessage = replaceFileContent(rawMessage, message.getAttachments());
                     String flagged = chatGpt.moderationCheck(rawMessage);
                     if (flagged != null) {
                         message.reply(flagged).queue();
@@ -75,6 +81,13 @@ public final class ChatGpt implements Handler {
                 logger.error(e);
             }
         }
+    }
+
+    private static String replaceFileContent(String message, List<Message.Attachment> attachments) throws ExecutionException, InterruptedException {
+        for (Message.Attachment attachment : attachments) {
+            message = message.replace("[[" + attachment.getFileName() + "]]", convertInputStreamToString(attachment.getProxy().download()).get());
+        }
+        return message;
     }
 
     @Override
@@ -127,7 +140,20 @@ public final class ChatGpt implements Handler {
         chatGpt.reset(channelId, userId);
         event.reply("Chat history reset.").queue();
     }
-
+    public static CompletableFuture<String> convertInputStreamToString(CompletableFuture<InputStream> inputStreamFuture) {
+        return inputStreamFuture.thenApplyAsync(inputStream -> {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                StringBuilder stringBuilder = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    stringBuilder.append(line).append(System.lineSeparator());
+                }
+                return stringBuilder.toString();
+            } catch (IOException e) {
+                throw new RuntimeException("Error reading InputStream", e);
+            }
+        });
+    }
     private static List<String> splitResponse(String response) {
         List<String> responses = new ArrayList<>();
         int strlen = response.length();
