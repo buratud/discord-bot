@@ -26,11 +26,14 @@ public final class ChatGpt implements Handler {
     private static final Logger logger = LogManager.getLogger(ChatGpt.class);
     private static ChatGpt instance;
     private final com.buratud.services.ChatGpt chatGpt;
-    private final HashMap<String, String> fileExtMap;
+    private static final HashMap<String, String> fileExtMap;
+
+    static {
+        fileExtMap = createFileExtensionMap();
+    }
 
     private ChatGpt() throws IOException {
         Service service = Service.getInstance();
-        fileExtMap = createFileExtensionMap();
         chatGpt = service.chatgpt;
     }
 
@@ -83,13 +86,6 @@ public final class ChatGpt implements Handler {
         }
     }
 
-    private static String replaceFileContent(String message, List<Message.Attachment> attachments) throws ExecutionException, InterruptedException {
-        for (Message.Attachment attachment : attachments) {
-            message = message.replace("[[" + attachment.getFileName() + "]]", convertInputStreamToString(attachment.getProxy().download()).get());
-        }
-        return message;
-    }
-
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         try {
@@ -140,6 +136,7 @@ public final class ChatGpt implements Handler {
         chatGpt.reset(channelId, userId);
         event.reply("Chat history reset.").queue();
     }
+
     public static CompletableFuture<String> convertInputStreamToString(CompletableFuture<InputStream> inputStreamFuture) {
         return inputStreamFuture.thenApplyAsync(inputStream -> {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
@@ -154,6 +151,7 @@ public final class ChatGpt implements Handler {
             }
         });
     }
+
     private static List<String> splitResponse(String response) {
         List<String> responses = new ArrayList<>();
         int strlen = response.length();
@@ -193,7 +191,14 @@ public final class ChatGpt implements Handler {
         return responses;
     }
 
-    private HashMap<String, String> createFileExtensionMap() {
+    private static String replaceFileContent(String message, List<Message.Attachment> attachments) throws ExecutionException, InterruptedException {
+        for (Message.Attachment attachment : attachments) {
+            message = message.replace("[[" + attachment.getFileName() + "]]", convertInputStreamToString(attachment.getProxy().download()).get());
+        }
+        return message;
+    }
+
+    private static HashMap<String, String> createFileExtensionMap() {
         HashMap<String, String> fileExtension = new HashMap<>();
         fileExtension.put("python", ".py");
         fileExtension.put("javascript", ".js");
@@ -228,12 +233,12 @@ public final class ChatGpt implements Handler {
         return fileExtension;
     }
 
-    private String detectFileExtension(String first_line) {
+    private static String detectFileExtension(String first_line) {
         String language = first_line.substring(3);
         return fileExtMap.getOrDefault(language, ".txt");
     }
 
-    private FileUpload convertToDiscordFile(String response) throws IOException {
+    private static FileUpload convertToDiscordFile(String response) throws IOException {
         int firstNewLine = response.indexOf('\n');
         int lastNewLine = response.lastIndexOf('\n');
         String firstLine = response.substring(0, firstNewLine);
