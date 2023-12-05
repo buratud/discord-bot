@@ -54,7 +54,6 @@ public class ChatGpt {
         ChatCompletionRequest request = new ChatCompletionRequestBuilder(info.model, info.history).build();
         ChatCompletionResponse response = client.sendChatCompletionRequest(request);
         String messageRes = response.choices.get(0).message.content;
-        messageRes = messageRes.replace("\n\n", "\n");
         info.history.add(new ChatMessage(Role.ASSISTANT, messageRes));
         store.save(channelId, userId, info);
         return String.format("%s\n\nTotal tokens: %d", messageRes, response.usage.totalTokens);
@@ -70,7 +69,6 @@ public class ChatGpt {
         EventStreamSubscriber subscriber = new EventStreamSubscriber();
         client.sendChatCompletionRequestWithStreamEnabled(request, subscriber);
         String messageRes = subscriber.getContent();
-        messageRes = messageRes.replace("\n\n", "\n");
         info.history.add(new ChatMessage(Role.ASSISTANT, messageRes));
         store.save(channelId, userId, info);
         return String.format("%s", messageRes);
