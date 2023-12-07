@@ -135,7 +135,7 @@ public class ChatGpt {
 
         @Override
         public void onNext(String content) {
-            logger.info(content);
+            logger.debug(content);
             content = content.substring(content.indexOf(':') + 2);
             if (content.contentEquals("[DONE]")) {
                 return;
@@ -158,7 +158,7 @@ public class ChatGpt {
         }
 
         public String getContent() {
-            logger.info(builder.toString());
+            logger.debug(builder.toString());
             return builder.toString();
         }
     }
