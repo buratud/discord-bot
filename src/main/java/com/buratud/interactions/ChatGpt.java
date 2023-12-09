@@ -3,7 +3,6 @@ package com.buratud.interactions;
 import com.buratud.Service;
 import com.buratud.data.ChatGptChannelInfo;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -19,7 +18,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
@@ -131,7 +129,7 @@ public final class ChatGpt implements Handler {
         }
     }
 
-    private void switchModel(SlashCommandInteractionEvent event) throws ExecutionException, InterruptedException {
+    private void switchModel(SlashCommandInteractionEvent event) {
         String channelId = event.getMessageChannel().getId();
         String userId = event.getMember().getId();
         String model = event.getOption("model").getAsString();
@@ -292,7 +290,7 @@ public final class ChatGpt implements Handler {
         return fileExtMap.getOrDefault(language, ".txt");
     }
 
-    private static FileUpload convertToDiscordFile(String response) throws IOException {
+    private static FileUpload convertToDiscordFile(String response) {
         int firstNewLine = response.indexOf('\n');
         int lastNewLine = response.lastIndexOf('\n');
         String firstLine = response.substring(0, firstNewLine);
