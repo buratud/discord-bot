@@ -3,6 +3,7 @@ package com.buratud.interactions;
 import com.buratud.Service;
 import com.buratud.data.ChatGptChannelInfo;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -21,6 +22,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class ChatGpt implements Handler {
     private static final Logger logger = LogManager.getLogger(ChatGpt.class);
@@ -158,42 +161,87 @@ public final class ChatGpt implements Handler {
         });
     }
 
-    private static List<String> splitResponse(String response) {
+    public static List<String> splitResponse(String response) {
+        final int MAX_LENGTH = 2000;
         List<String> responses = new ArrayList<>();
         int strlen = response.length();
-        int last_index = 0;
-        boolean is_code = false;
-        while (last_index < strlen) {
-            if (last_index == -1) {
-                throw new IllegalArgumentException("Split response failed.");
+        Pattern pattern = Pattern.compile("(\\d+\\.|-)\\s");
+        Matcher matcher = pattern.matcher(response);
+        int start = 0, end = 0;
+        int startLine = 0, endLine = -2;
+        // Special means a list or a code
+        int startSpecial = -1, endSpecial = -1;
+        boolean isCode = false, isList = false;
+        while (endLine != strlen) {
+            while (startLine < strlen && response.charAt(startLine) == '\n') {
+                startLine++;
             }
-            if (is_code) {
-                int end = response.indexOf("```", last_index + 3);
-                if (end != -1) {
-                    end += 3;
-                } else {
-                    // Code block not found, handle the error case
-                    throw new IllegalArgumentException("Code block not found.");
-                }
-                responses.add(response.substring(last_index, end));
-                // Assuming that it will always have \n after the code block
-                last_index = end + 1;
-                is_code = false;
-            } else {
-                if (last_index + 2000 > strlen) {
-                    responses.add(response.substring(last_index));
-                    break;
-                }
-                int end = response.indexOf("\n```", last_index);
-                if (end == -1 || end - last_index > 2000) {
-                    end = response.lastIndexOf('\n', last_index + 2000);
-                } else {
-                    is_code = true;
-                }
-                responses.add(response.substring(last_index, end));
-                last_index = end + 1;
+            endLine = response.indexOf('\n', endLine + 2);
+            if (endLine == -1) {
+                endLine = strlen;
             }
+            // This line is a top-level list
+            if (matcher.find(startLine) && matcher.start() == startLine) {
+                // This line starts a list
+                if (isList) {
+                    // If this is true earlier, it means this line is a new top-level list
+                    if (endSpecial - start <= MAX_LENGTH) {
+                        end = endSpecial;
+                    } else {
+                        responses.add(response.substring(start, end));
+                        start = startSpecial;
+                        end = endSpecial;
+                    }
+                }
+                startSpecial = startLine;
+                isList = true;
+            } else if (response.startsWith("```", startLine)) {
+                // This line is either a start or end of code
+                if (isCode) {
+                    // Indicates that this is the end of the code
+                    if (endLine - start > MAX_LENGTH) {
+                        responses.add(response.substring(start, end));
+                        start = startSpecial;
+                    }
+                    end = endLine;
+                } else {
+                    startSpecial = startLine;
+                }
+                isCode = !isCode;
+            } else if (!isCode && response.charAt(startLine) != ' ') {
+                // This is regular line of text
+                isList = false;
+                // There might be some special text
+                if (startSpecial != -1) {
+                    if (endSpecial - start <= MAX_LENGTH) {
+                        end = endSpecial;
+                    } else {
+                        responses.add(response.substring(start, end));
+                        start = startSpecial;
+                        end = endSpecial;
+                    }
+                    startSpecial = -1;
+                }
+                if (endLine - start > MAX_LENGTH) {
+                    responses.add(response.substring(start, end));
+                    start = startLine;
+                }
+                end = endLine;
+            }
+            if (isList || isCode) {
+                endSpecial = endLine;
+            }
+            startLine = endLine;
         }
+        // Add the remaining text
+        if (endLine - start > MAX_LENGTH) {
+            responses.add(response.substring(start, end));
+            start = end;
+        }
+        while (start < strlen && response.charAt(start) == '\n') {
+            start++;
+        }
+        responses.add(response.substring(start, endLine));
         return responses;
     }
 
