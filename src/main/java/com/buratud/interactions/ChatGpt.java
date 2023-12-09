@@ -82,6 +82,9 @@ public final class ChatGpt implements Handler {
             } catch (Exception e) {
                 event.getMessage().reply("Something went wrong, try again later.").queue();
                 logger.error(e);
+                for (StackTraceElement element : e.getStackTrace()) {
+                    logger.error(element.toString());
+                }
             }
         }
     }
@@ -101,11 +104,14 @@ public final class ChatGpt implements Handler {
                 event.reply("Module is unavailable").queue();
             }
         } catch (Exception e) {
-            logger.error(e);
             if (event.isAcknowledged()) {
                 event.getHook().sendMessage("Something went wrong, try again later.").queue();
             } else {
                 event.reply("Something went wrong, try again later.").setEphemeral(true).queue();
+            }
+            logger.error(e);
+            for (StackTraceElement element : e.getStackTrace()) {
+                logger.error(element.toString());
             }
         }
     }
