@@ -138,6 +138,7 @@ public class ChatGptTests {
         List<String> actual = ChatGpt.splitResponse(original);
         assertEquals(expected, actual);
     }
+
     @Test
     public void testSplitResponse4() {
         String original = """
@@ -145,6 +146,87 @@ public class ChatGptTests {
                 1. A very long text of Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et vehicula dui. Cras felis odio, feugiat vel malesuada nec, aliquet non ipsum. Vivamus tempor neque velit, non malesuada ex scelerisque non. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris feugiat nunc elit, sed tincidunt ex interdum non. Duis hendrerit tortor augue, non porta purus fermentum a. Phasellus finibus dui dapibus, egestas quam et, congue magna. Pellentesque ullamcorper est id ligula scelerisque dapibus. Maecenas congue pharetra ex sed accumsan. Vestibulum consequat a neque a malesuada. Phasellus hendrerit, velit at porttitor tristique, orci dolor pretium mi, elementum vestibulum nisi justo in ex. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus gravida justo ac sodales rutrum. Morbi hendrerit ligula at enim congue, sed feugiat elit congue. Quisque nisi enim, varius sodales elit vitae, porta consequat lorem. Donec eu maximus velit. Mauris et mi orci. Vestibulum efficitur tortor justo, sed convallis quam porta vitae. Donec vitae rutrum arcu. Morbi sit amet pretium nulla. Sed eleifend velit at enim volutpat, nec vehicula eros convallis. Fusce rutrum finibus elit sed elementum. Aenean tincidunt tincidunt odio, vitae feugiat leo laoreet sed. Pellentesque metus turpis, consectetur nec fermentum in, euismod sit amet lectus. Proin a risus neque. Aliquam eu magna ultrices, tincidunt lacus eget, blandit turpis. Nunc libero velit, varius in consequat gravida, egestas eu elit. Aliquam vitae scelerisque neque, sed tincidunt turpis. Donec ut erat lobortis, dignissim justo sit amet, fringilla massa. Etiam vitae elit a nisl mattis dapibus. Duis velit massa, lacinia ut malesuada sit amet, dictum eget metus.""";
         List<String> expected = List.of("A text with Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et vehicula dui. Cras felis odio, feugiat vel malesuada nec, aliquet non ipsum. Vivamus tempor neque velit, non malesuada ex scelerisque non. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris feugiat nunc elit, sed tincidunt ex interdum non. Duis hendrerit tortor augue, non porta purus fermentum a. Phasellus finibus dui dapibus, egestas quam et, congue magna. Pellentesque ullamcorper est id ligula scelerisque dapibus. Maecenas congue pharetra ex sed accumsan. Vestibulum consequat a neque a malesuada. Phasellus hendrerit, velit at porttitor tristique, orci dolor pretium mi, elementum vestibulum nisi justo in ex. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus gravida justo ac sodales rutrum. Morbi hendrerit ligula at enim congue, sed feugiat elit congue. Quisque nisi enim, varius sodales elit vitae, porta consequat lorem. Donec eu maximus velit. Mauris et mi orci. Vestibulum efficitur tortor justo, sed convallis quam porta vitae. Donec vitae rutrum arcu. Morbi sit amet pretium nulla. Sed eleifend velit at enim volutpat, nec vehicula eros convallis. Fusce rutrum finibus elit sed elementum. Aenean tincidunt tincidunt odio, vitae feugiat leo laoreet sed. Pellentesque metus turpis, consectetur nec fermentum in, euismod sit amet lectus. Proin a risus neque. Aliquam eu magna ultrices, tincidunt lacus eget, blandit turpis. Nunc libero velit, varius in consequat gravida, egestas eu elit. Aliquam vitae scelerisque neque, sed tincidunt turpis. Donec ut erat lobortis, dignissim justo sit amet, fringilla massa. Etiam vitae elit a nisl mattis dapibus. Duis velit massa, lacinia ut malesuada sit amet, dictum eget metus.",
                 "1. A very long text of Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et vehicula dui. Cras felis odio, feugiat vel malesuada nec, aliquet non ipsum. Vivamus tempor neque velit, non malesuada ex scelerisque non. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris feugiat nunc elit, sed tincidunt ex interdum non. Duis hendrerit tortor augue, non porta purus fermentum a. Phasellus finibus dui dapibus, egestas quam et, congue magna. Pellentesque ullamcorper est id ligula scelerisque dapibus. Maecenas congue pharetra ex sed accumsan. Vestibulum consequat a neque a malesuada. Phasellus hendrerit, velit at porttitor tristique, orci dolor pretium mi, elementum vestibulum nisi justo in ex. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus gravida justo ac sodales rutrum. Morbi hendrerit ligula at enim congue, sed feugiat elit congue. Quisque nisi enim, varius sodales elit vitae, porta consequat lorem. Donec eu maximus velit. Mauris et mi orci. Vestibulum efficitur tortor justo, sed convallis quam porta vitae. Donec vitae rutrum arcu. Morbi sit amet pretium nulla. Sed eleifend velit at enim volutpat, nec vehicula eros convallis. Fusce rutrum finibus elit sed elementum. Aenean tincidunt tincidunt odio, vitae feugiat leo laoreet sed. Pellentesque metus turpis, consectetur nec fermentum in, euismod sit amet lectus. Proin a risus neque. Aliquam eu magna ultrices, tincidunt lacus eget, blandit turpis. Nunc libero velit, varius in consequat gravida, egestas eu elit. Aliquam vitae scelerisque neque, sed tincidunt turpis. Donec ut erat lobortis, dignissim justo sit amet, fringilla massa. Etiam vitae elit a nisl mattis dapibus. Duis velit massa, lacinia ut malesuada sit amet, dictum eget metus.");
+        List<String> actual = ChatGpt.splitResponse(original);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testSplitResponse5() {
+        String original = """
+                In PowerShell, it's a bit challenging to create a retro-style terminal UI with arrows indicating the selection. However, we can achieve a similar result using just the terminal. We can use the `Write-Host` cmdlet to display the choices and capture the user's input.
+                Here is a modified PowerShell script that simulates the retro-style terminal UI for selecting the publisher, offer, and SKU:
+                ```powershell
+                # Ask the user for the location
+                $locName = Read-Host "Enter the location"
+                Write-Host "Select a publisher:"
+                # List the publishers in the specified location
+                $publisherNames = Get-AzVMImagePublisher -Location $locName | Select PublisherName
+                for ($i=0; $i -lt $publisherNames.Count; $i++) {
+                    Write-Host ("{0}. {1}" -f ($i+1), $publisherNames[$i].PublisherName)
+                }
+                # Allow the user to select a publisher
+                $publisherChoice = Read-Host "Enter the number of the publisher"
+                $selectedPublisher = $publisherNames[$publisherChoice - 1].PublisherName
+                Write-Host "Select an offer:"
+                # List the offers for the selected publisher
+                $offerNames = Get-AzVMImageOffer -Location $locName -PublisherName $selectedPublisher | Select Offer
+                for ($i=0; $i -lt $offerNames.Count; $i++) {
+                    Write-Host ("{0}. {1}" -f ($i+1), $offerNames[$i].Offer)
+                }
+                # Allow the user to select an offer
+                $offerChoice = Read-Host "Enter the number of the offer"
+                $selectedOffer = $offerNames[$offerChoice - 1].Offer
+                Write-Host "Select a SKU:"
+                # List the SKUs for the selected offer and publisher
+                $skuNames = Get-AzVMImageSku -Location $locName -PublisherName $selectedPublisher -Offer $selectedOffer | Select Skus
+                for ($i=0; $i -lt $skuNames.Count; $i++) {
+                    Write-Host ("{0}. {1}" -f ($i+1), $skuNames[$i].Skus)
+                }
+                # Allow the user to select a SKU
+                $skuChoice = Read-Host "Enter the number of the SKU"
+                $selectedSku = $skuNames[$skuChoice - 1].Skus
+                # List the versions for the selected offer, publisher, and SKU
+                $versions = Get-AzVMImage -Location $locName -PublisherName $selectedPublisher -Offer $selectedOffer -Sku $selectedSku | Select Version
+                # Display the list of versions
+                $versions
+                ```""";
+        List<String> expected = List.of("In PowerShell, it's a bit challenging to create a retro-style terminal UI with arrows indicating the selection. However, we can achieve a similar result using just the terminal. We can use the `Write-Host` cmdlet to display the choices and capture the user's input.\nHere is a modified PowerShell script that simulates the retro-style terminal UI for selecting the publisher, offer, and SKU:",
+                """
+                        ```powershell
+                        # Ask the user for the location
+                        $locName = Read-Host "Enter the location"
+                        Write-Host "Select a publisher:"
+                        # List the publishers in the specified location
+                        $publisherNames = Get-AzVMImagePublisher -Location $locName | Select PublisherName
+                        for ($i=0; $i -lt $publisherNames.Count; $i++) {
+                            Write-Host ("{0}. {1}" -f ($i+1), $publisherNames[$i].PublisherName)
+                        }
+                        # Allow the user to select a publisher
+                        $publisherChoice = Read-Host "Enter the number of the publisher"
+                        $selectedPublisher = $publisherNames[$publisherChoice - 1].PublisherName
+                        Write-Host "Select an offer:"
+                        # List the offers for the selected publisher
+                        $offerNames = Get-AzVMImageOffer -Location $locName -PublisherName $selectedPublisher | Select Offer
+                        for ($i=0; $i -lt $offerNames.Count; $i++) {
+                            Write-Host ("{0}. {1}" -f ($i+1), $offerNames[$i].Offer)
+                        }
+                        # Allow the user to select an offer
+                        $offerChoice = Read-Host "Enter the number of the offer"
+                        $selectedOffer = $offerNames[$offerChoice - 1].Offer
+                        Write-Host "Select a SKU:"
+                        # List the SKUs for the selected offer and publisher
+                        $skuNames = Get-AzVMImageSku -Location $locName -PublisherName $selectedPublisher -Offer $selectedOffer | Select Skus
+                        for ($i=0; $i -lt $skuNames.Count; $i++) {
+                            Write-Host ("{0}. {1}" -f ($i+1), $skuNames[$i].Skus)
+                        }
+                        # Allow the user to select a SKU
+                        $skuChoice = Read-Host "Enter the number of the SKU"
+                        $selectedSku = $skuNames[$skuChoice - 1].Skus
+                        # List the versions for the selected offer, publisher, and SKU
+                        $versions = Get-AzVMImage -Location $locName -PublisherName $selectedPublisher -Offer $selectedOffer -Sku $selectedSku | Select Version
+                        # Display the list of versions
+                        $versions
+                        ```""");
         List<String> actual = ChatGpt.splitResponse(original);
         assertEquals(expected, actual);
     }
