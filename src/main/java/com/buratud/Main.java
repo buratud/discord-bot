@@ -54,7 +54,7 @@ public class Main extends ListenerAdapter {
                                                 .setRequired(true)
                                         )
                         )
-        ).queue();
+        ).complete();
     }
 
     @Override

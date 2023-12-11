@@ -32,7 +32,7 @@ public class Ocr implements Handler {
         try {
             ocr(event);
         } catch (IOException | InterruptedException e) {
-            event.reply("Something went wrong, try again later.").queue();
+            event.reply("Something went wrong, try again later.").complete();
             logger.error(e);
             for (StackTraceElement element : e.getStackTrace()) {
                 logger.error(element.toString());
@@ -43,8 +43,8 @@ public class Ocr implements Handler {
 
     public void ocr(MessageContextInteractionEvent event) throws IOException, InterruptedException {
         String url = event.getTarget().getAttachments().get(0).getUrl();
-        event.deferReply().queue();
+        event.deferReply().complete();
         String[] result = vision.extractText(url);
-        event.getHook().sendMessage("```\n" + String.join("\n", result) + "\n```").queue();
+        event.getHook().sendMessage("```\n" + String.join("\n", result) + "\n```").complete();
     }
 }

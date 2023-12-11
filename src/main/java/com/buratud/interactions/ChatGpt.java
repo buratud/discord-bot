@@ -67,21 +67,21 @@ public final class ChatGpt implements Handler {
                     rawMessage = replaceFileContent(rawMessage, message.getAttachments());
                     String flagged = chatGpt.moderationCheck(rawMessage);
                     if (flagged != null) {
-                        message.reply(flagged).queue();
+                        message.reply(flagged).complete();
                         return;
                     }
                     String res = chatGpt.sendStreamEnabled(channelId, userId, rawMessage);
                     List<String> responses = splitResponse(res);
                     for (String response : responses) {
                         if (response.startsWith("```")) {
-                            message.replyFiles(convertToDiscordFile(response)).queue();
+                            message.replyFiles(convertToDiscordFile(response)).complete();
                         } else {
-                            message.reply(response).queue();
+                            message.reply(response).complete();
                         }
                     }
                 }
             } catch (Exception e) {
-                event.getMessage().reply("Something went wrong, try again later.").queue();
+                event.getMessage().reply("Something went wrong, try again later.").complete();
                 logger.error(e);
                 for (StackTraceElement element : e.getStackTrace()) {
                     logger.error(element.toString());
@@ -99,16 +99,16 @@ public final class ChatGpt implements Handler {
                     case "reset" -> resetChatHistory(event);
                     case "model" -> switchModel(event);
                     case "activation" -> activate(event);
-                    default -> event.reply("Subcommand doesn't exist.").queue();
+                    default -> event.reply("Subcommand doesn't exist.").complete();
                 }
             } else {
-                event.reply("Module is unavailable").queue();
+                event.reply("Module is unavailable").complete();
             }
         } catch (Exception e) {
             if (event.isAcknowledged()) {
-                event.getHook().sendMessage("Something went wrong, try again later.").queue();
+                event.getHook().sendMessage("Something went wrong, try again later.").complete();
             } else {
-                event.reply("Something went wrong, try again later.").setEphemeral(true).queue();
+                event.reply("Something went wrong, try again later.").setEphemeral(true).complete();
             }
             logger.error(e);
             for (StackTraceElement element : e.getStackTrace()) {
@@ -123,9 +123,9 @@ public final class ChatGpt implements Handler {
         Boolean activation = event.getOption("activate").getAsBoolean();
         chatGpt.SetActivation(channelId, userId, activation);
         if (activation) {
-            event.reply("Activated.").queue();
+            event.reply("Activated.").complete();
         } else {
-            event.reply("Deactivated.").queue();
+            event.reply("Deactivated.").complete();
         }
     }
 
@@ -134,14 +134,14 @@ public final class ChatGpt implements Handler {
         String userId = event.getMember().getId();
         String model = event.getOption("model").getAsString();
         chatGpt.SwitchModel(channelId, userId, model);
-        event.reply(String.format("Switched to %s model.", model)).queue();
+        event.reply(String.format("Switched to %s model.", model)).complete();
     }
 
     private void resetChatHistory(SlashCommandInteractionEvent event) {
         String channelId = event.getMessageChannel().getId();
         String userId = event.getMember().getId();
         chatGpt.reset(channelId, userId);
-        event.reply("Chat history reset.").queue();
+        event.reply("Chat history reset.").complete();
     }
 
     public static CompletableFuture<String> convertInputStreamToString(CompletableFuture<InputStream> inputStreamFuture) {
