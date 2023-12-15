@@ -230,4 +230,100 @@ public class ChatGptTests {
         List<String> actual = ChatGpt.splitResponse(original);
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void testSplitResponse6() {
+        String original = """
+                To detect voice activity in an audio stream, you can use various algorithms and techniques for speech and audio processing. One common approach is to use a method called "Voice Activity Detection" (VAD), which analyzes the audio signal to determine whether it contains speech or is silent.
+                Here's a simplified example in Python using the librosa library to perform a basic voice activity detection:
+                First, make sure to install the librosa library using pip:
+                ```bash
+                pip install librosa
+                ```
+                Then, you can use the following example code to perform basic voice activity detection:
+                ```python
+                import librosa
+                import numpy as np
+                from pydub import AudioSegment
+                # Load the audio file
+                audio_file = "audio.wav"
+                audio, sr = librosa.load(audio_file, sr=None)
+                # Set the threshold for voice activity detection
+                threshold = 0.02
+                # Calculate energy of the audio signal using the root mean square (rms) of short windows
+                window_size = 2048
+                energy = np.array([sum(abs(audio[i:i+window_size]**2)) for i in range(0, len(audio), window_size)])
+                energy_db = librosa.amplitude_to_db(energy, ref=np.max)
+                # Apply voice activity detection
+                vad_segments = []
+                vad_started = False
+                start_time = 0
+                for i in range(len(energy_db)):
+                    if energy_db[i] > threshold and not vad_started:
+                        vad_started = True
+                        start_time = i * window_size / sr
+                    elif energy_db[i] <= threshold and vad_started:
+                        vad_started = False
+                        end_time = i * window_size / sr
+                        vad_segments.append((start_time, end_time))
+                # Apply detected segments to the original audio to create a new audio file
+                original_audio = AudioSegment.from_file(audio_file)
+                output_audio = AudioSegment.silent(duration=0)
+                for segment in vad_segments:
+                    start_frame = int(segment[0] * sr)
+                    end_frame = int(segment[1] * sr)
+                    segment_audio = original_audio[start_frame:end_frame]
+                    output_audio += segment_audio
+                output_audio.export("vad_output.wav", format="wav")
+                ```
+                In this example, we load the audio file using the librosa library and calculate the energy of the audio signal using short windows and the root mean square (RMS). We then apply a simple threshold-based method to detect voice activity based on the energy level. detected segments are then applied to the original audio to create a new audio file containing only the segments of voice activity.
+                Please note that this is a basic example of voice activity detection. More advanced methods, such as machine learning-based approaches, are available for more accurate and robust voice activity detection.""";
+        List<String> expected = List.of("""
+                To detect voice activity in an audio stream, you can use various algorithms and techniques for speech and audio processing. One common approach is to use a method called "Voice Activity Detection" (VAD), which analyzes the audio signal to determine whether it contains speech or is silent.
+                Here's a simplified example in Python using the librosa library to perform a basic voice activity detection:
+                First, make sure to install the librosa library using pip:
+                ```bash
+                pip install librosa
+                ```
+                Then, you can use the following example code to perform basic voice activity detection:
+                ```python
+                import librosa
+                import numpy as np
+                from pydub import AudioSegment
+                # Load the audio file
+                audio_file = "audio.wav"
+                audio, sr = librosa.load(audio_file, sr=None)
+                # Set the threshold for voice activity detection
+                threshold = 0.02
+                # Calculate energy of the audio signal using the root mean square (rms) of short windows
+                window_size = 2048
+                energy = np.array([sum(abs(audio[i:i+window_size]**2)) for i in range(0, len(audio), window_size)])
+                energy_db = librosa.amplitude_to_db(energy, ref=np.max)
+                # Apply voice activity detection
+                vad_segments = []
+                vad_started = False
+                start_time = 0
+                for i in range(len(energy_db)):
+                    if energy_db[i] > threshold and not vad_started:
+                        vad_started = True
+                        start_time = i * window_size / sr
+                    elif energy_db[i] <= threshold and vad_started:
+                        vad_started = False
+                        end_time = i * window_size / sr
+                        vad_segments.append((start_time, end_time))
+                # Apply detected segments to the original audio to create a new audio file
+                original_audio = AudioSegment.from_file(audio_file)
+                output_audio = AudioSegment.silent(duration=0)
+                for segment in vad_segments:
+                    start_frame = int(segment[0] * sr)
+                    end_frame = int(segment[1] * sr)
+                    segment_audio = original_audio[start_frame:end_frame]
+                    output_audio += segment_audio
+                output_audio.export("vad_output.wav", format="wav")
+                ```""", """
+                In this example, we load the audio file using the librosa library and calculate the energy of the audio signal using short windows and the root mean square (RMS). We then apply a simple threshold-based method to detect voice activity based on the energy level. detected segments are then applied to the original audio to create a new audio file containing only the segments of voice activity.
+                Please note that this is a basic example of voice activity detection. More advanced methods, such as machine learning-based approaches, are available for more accurate and robust voice activity detection.""");
+        List<String> actual = ChatGpt.splitResponse(original);
+        assertEquals(expected, actual);
+    }
 }
