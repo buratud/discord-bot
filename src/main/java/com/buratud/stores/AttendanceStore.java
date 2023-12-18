@@ -11,7 +11,7 @@ public interface AttendanceStore {
     Attendance readAttendance(String guildId, String channelId, String id);
     List<Attendance> readAllAttendance(String guildId, String channelId);
 
-    void updateAttendance(Attendance item);
+    Attendance updateAttendance(Attendance item);
 
     void deleteAttendance(String guildId, String channelId, String id);
 
@@ -19,7 +19,7 @@ public interface AttendanceStore {
 
     ChannelMetadata readAttendanceMetadata(String guildId, String channelId);
 
-    void updateAttendanceMetadata(ChannelMetadata item);
+    ChannelMetadata updateAttendanceMetadata(ChannelMetadata item);
 
     void deleteAttendance(String guildId, String channelId);
 }

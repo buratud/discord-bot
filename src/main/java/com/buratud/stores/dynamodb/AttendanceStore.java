@@ -43,8 +43,8 @@ public class AttendanceStore implements com.buratud.stores.AttendanceStore {
     }
 
     @Override
-    public void updateAttendance(Attendance item) {
-        attendanceTable.updateItem(item);
+    public Attendance updateAttendance(Attendance item) {
+        return attendanceTable.updateItem(item);
     }
 
     @Override
@@ -65,8 +65,8 @@ public class AttendanceStore implements com.buratud.stores.AttendanceStore {
     }
 
     @Override
-    public void updateAttendanceMetadata(ChannelMetadata item) {
-        attendanceMetadataTable.updateItem(item);
+    public ChannelMetadata updateAttendanceMetadata(ChannelMetadata item) {
+        return attendanceMetadataTable.updateItem(item);
     }
 
     @Override
