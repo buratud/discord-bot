@@ -1,5 +1,6 @@
 package com.buratud.interactions;
 
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -16,6 +17,10 @@ public interface Handler {
     }
 
     default void onMessageReceived(@NotNull MessageReceivedEvent event) throws NotImplementedException {
+        throw new NotImplementedException();
+    }
+
+    default void onGuildVoiceUpdate(GuildVoiceUpdateEvent event) throws NotImplementedException {
         throw new NotImplementedException();
     }
 }

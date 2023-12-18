@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.buratud.interactions.Attendance;
 import com.buratud.interactions.ChatGpt;
 
 import com.buratud.interactions.Ocr;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.SelfUser;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -29,15 +31,17 @@ public class Main extends ListenerAdapter {
     private final ExecutorService executor;
     private final ChatGpt chatGPT;
     private final Ocr ocr;
+    private final Attendance attendance;
 
     private Main() throws IOException {
         executor = Executors.newCachedThreadPool();
         chatGPT = ChatGpt.getInstance();
         ocr = Ocr.getInstance();
+        attendance = Attendance.getInstance();
     }
 
     public static void main(String[] args) throws InterruptedException, IOException {
-        JDA jda = JDABuilder.createDefault(Env.DISCORD_TOKEN).enableIntents(GatewayIntent.MESSAGE_CONTENT).addEventListeners(new Main()).build();
+        JDA jda = JDABuilder.createDefault(Env.DISCORD_TOKEN).enableIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_VOICE_STATES).addEventListeners(new Main()).build();
         jda.awaitReady();
         jda.updateCommands().addCommands(
                 Commands.message("OCR"),
@@ -53,7 +57,14 @@ public class Main extends ListenerAdapter {
                                         .addOptions(new OptionData(OptionType.BOOLEAN, "activate", "Set whether to continuously use.")
                                                 .setRequired(true)
                                         )
-                        )
+                        ),
+                Commands.slash("attendance", "Attendance command.")
+                        .addSubcommands(new SubcommandData("start", "Start attendance session.")
+                                        .addOptions(new OptionData(OptionType.CHANNEL, "channel", "Voice channel to be monitor.")),
+                                new SubcommandData("stop", "Stop attendance session.")
+                                        .addOptions(new OptionData(OptionType.CHANNEL, "channel", "Voice channel to be monitor.")),
+                                new SubcommandData("now", "Get current attendance.")
+                                        .addOptions(new OptionData(OptionType.CHANNEL, "channel", "Voice channel to be monitor.")))
         ).complete();
     }
 
@@ -71,7 +82,15 @@ public class Main extends ListenerAdapter {
         executor.submit(() -> {
             switch (event.getName()) {
                 case "chatgpt" -> chatGPT.onSlashCommandInteraction(event);
+                case "attendance" -> attendance.onSlashCommandInteraction(event);
             }
+        });
+    }
+
+    @Override
+    public void onGuildVoiceUpdate(GuildVoiceUpdateEvent event) {
+        executor.submit(() -> {
+            attendance.onGuildVoiceUpdate(event);
         });
     }
 
