@@ -58,6 +58,10 @@ public class Main extends ListenerAdapter {
                                         .addOptions(new OptionData(OptionType.BOOLEAN, "activate", "Set whether to continuously use.")
                                                 .setRequired(true)
                                         ),
+                                new SubcommandData("oneshot", "Set one shot to save cost.")
+                                        .addOptions(new OptionData(OptionType.BOOLEAN, "activate", "Set whether to activate one-shot.")
+                                                .setRequired(true)
+                                        ),
                                 new SubcommandData("system", "Set a system message for this channel.")
                         ),
                 Commands.slash("attendance", "Attendance command.")

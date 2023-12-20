@@ -15,4 +15,7 @@ public final class ChatGptMetadata extends MemberChannelData {
     }
     @SerializedName("system_message")
     private String systemMessage;
+
+    @SerializedName("one_shot")
+    private boolean oneShot;
 }

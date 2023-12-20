@@ -112,6 +112,7 @@ public final class ChatGpt implements Handler {
                     case "model" -> switchModel(event);
                     case "activation" -> activate(event);
                     case "system" -> systemMessage(event);
+                    case "oneshot" -> oneshot(event);
                     default -> event.reply("Subcommand doesn't exist.").complete();
                 }
             } else {
@@ -148,6 +149,18 @@ public final class ChatGpt implements Handler {
             event.reply("Activated.").complete();
         } else {
             event.reply("Deactivated.").complete();
+        }
+    }
+
+    private void oneshot(SlashCommandInteractionEvent event) {
+        String channelId = event.getMessageChannel().getId();
+        String userId = event.getMember().getId();
+        Boolean activation = event.getOption("activate").getAsBoolean();
+        chatGpt.SetOneShot(channelId, userId, activation);
+        if (activation) {
+            event.reply("Activated. The response will not be saved from now on.").complete();
+        } else {
+            event.reply("Deactivated. The response will now continue to save.").complete();
         }
     }
 

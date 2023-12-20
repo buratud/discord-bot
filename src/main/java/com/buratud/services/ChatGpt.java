@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -67,14 +68,19 @@ public class ChatGpt {
         if (info == null) {
             info = reset(channelId, userId);
         }
-        info.getHistory().add(new ChatMessage(Role.USER, message));
-        ChatCompletionRequest request = new ChatCompletionRequestBuilder(info.getModel(), info.getHistory()).withStream(true).build();
+        List<ChatMessage> messages = new ArrayList<>(List.copyOf(info.getHistory()).stream().toList());
+        messages.add(new ChatMessage(Role.USER, message));
+        ChatCompletionRequest request = new ChatCompletionRequestBuilder(info.getModel(), messages).withStream(true).build();
         EventStreamSubscriber subscriber = new EventStreamSubscriber();
         client.sendChatCompletionRequestWithStreamEnabled(request, subscriber);
         String messageRes = subscriber.getContent();
         messageRes = messageRes.replace("\n\n", "\n");
-        info.getHistory().add(new ChatMessage(Role.ASSISTANT, messageRes));
-        store.putChannelInfo(info);
+        messages.add(new ChatMessage(Role.ASSISTANT, messageRes));
+        ChatGptMetadata metadata = store.getChannelMemberMetadata(null, channelId, userId);
+        if (metadata == null || !metadata.isOneShot()) {
+            info.setHistory(messages);
+            store.putChannelInfo(info);
+        }
         return String.format("%s", messageRes);
     }
 
@@ -125,6 +131,15 @@ public class ChatGpt {
         }
         info.setActivated(activation);
         store.putChannelInfo(info);
+    }
+
+    public void SetOneShot(String channelId, String userId, Boolean activation) {
+        ChatGptMetadata metadata = store.getChannelMemberMetadata(null, channelId, userId);
+        if (metadata == null) {
+            metadata = new ChatGptMetadata(null, channelId, userId);
+        }
+        metadata.setOneShot(activation);
+        store.createChannelMemberMetadata(metadata);
     }
 
     public String getSystemMessage(String channelId, String userId) {
