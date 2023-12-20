@@ -1,4 +1,4 @@
-package com.buratud.data;
+package com.buratud.data.openai;
 
 import com.buratud.data.openai.chat.ChatMessage;
 

@@ -1,7 +1,7 @@
 package com.buratud.interactions;
 
 import com.buratud.Service;
-import com.buratud.data.ChatGptChannelInfo;
+import com.buratud.data.openai.ChatGptChannelInfo;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;

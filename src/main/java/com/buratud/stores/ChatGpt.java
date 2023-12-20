@@ -1,8 +1,6 @@
 package com.buratud.stores;
 
-import java.util.List;
-
-import com.buratud.data.ChatGptChannelInfo;
+import com.buratud.data.openai.ChatGptChannelInfo;
 import com.buratud.data.openai.chat.ChatMessage;
 
 public interface ChatGpt {

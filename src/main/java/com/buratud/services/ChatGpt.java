@@ -1,6 +1,6 @@
 package com.buratud.services;
 
-import com.buratud.data.ChatGptChannelInfo;
+import com.buratud.data.openai.ChatGptChannelInfo;
 import com.buratud.data.openai.chat.*;
 import com.buratud.data.openai.moderation.ModerationResponse;
 import com.google.gson.Gson;

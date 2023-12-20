@@ -1,11 +1,9 @@
 package com.buratud.stores.ephemeral;
 
-import com.buratud.data.ChatGptChannelInfo;
+import com.buratud.data.openai.ChatGptChannelInfo;
 import com.buratud.data.openai.chat.ChatMessage;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class ChatGpt implements com.buratud.stores.ChatGpt {
 
