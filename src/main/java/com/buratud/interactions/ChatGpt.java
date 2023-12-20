@@ -77,7 +77,7 @@ public final class ChatGpt implements Handler {
                     String res = chatGpt.sendStreamEnabled(channelId, userId, rawMessage);
                     List<String> responses = splitResponse(res);
                     for (String response : responses) {
-                        if (response.startsWith("```")) {
+                        if (response.length() > 2000) {
                             message.replyFiles(convertToDiscordFile(response)).complete();
                         } else {
                             message.reply(response).complete();
