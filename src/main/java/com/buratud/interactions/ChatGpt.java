@@ -180,7 +180,7 @@ public final class ChatGpt implements Handler {
         if (systemMessage == null) {
             event.reply("Chat history reset.").complete();
         } else {
-            event.reply(String.format("Chat history reset.\nCurrent system message :%s", systemMessage)).complete();
+            event.reply(String.format("Chat history reset.\nCurrent system message: %s", systemMessage)).complete();
         }
     }
 
