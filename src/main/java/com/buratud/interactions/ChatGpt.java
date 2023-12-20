@@ -202,7 +202,7 @@ public final class ChatGpt implements Handler {
                         start = startSpecial;
                     }
                     end = endLine;
-                    endSpecial = endLine;
+                    startSpecial = -1;
                 } else {
                     startSpecial = startLine;
                 }
