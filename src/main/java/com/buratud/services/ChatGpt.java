@@ -42,37 +42,37 @@ public class ChatGpt {
     }
 
     public ChatGptChannelInfo getInfo(String channelId, String userId) {
-        return store.get(channelId, userId);
+        return store.getChannelInfo(null, channelId, userId);
     }
 
     public String send(String channelId, String userId, String message) throws IOException, InterruptedException {
-        ChatGptChannelInfo info = store.get(channelId, userId);
+        ChatGptChannelInfo info = store.getChannelInfo(null, channelId, userId);
         if (info == null) {
             info = reset(channelId, userId);
         }
-        info.history.add(new ChatMessage(Role.USER, message));
-        ChatCompletionRequest request = new ChatCompletionRequestBuilder(info.model, info.history).build();
+        info.getHistory().add(new ChatMessage(Role.USER, message));
+        ChatCompletionRequest request = new ChatCompletionRequestBuilder(info.getModel(), info.getHistory()).build();
         ChatCompletionResponse response = client.sendChatCompletionRequest(request);
         String messageRes = response.choices.get(0).message.content;
         messageRes = messageRes.replace("\n\n", "\n");
-        info.history.add(new ChatMessage(Role.ASSISTANT, messageRes));
-        store.save(channelId, userId, info);
+        info.getHistory().add(new ChatMessage(Role.ASSISTANT, messageRes));
+        store.putChannelInfo(info);
         return String.format("%s\n\nTotal tokens: %d", messageRes, response.usage.totalTokens);
     }
 
     public String sendStreamEnabled(String channelId, String userId, String message) throws InterruptedException, ExecutionException {
-        ChatGptChannelInfo info = store.get(channelId, userId);
+        ChatGptChannelInfo info = store.getChannelInfo(null, channelId, userId);
         if (info == null) {
             info = reset(channelId, userId);
         }
-        info.history.add(new ChatMessage(Role.USER, message));
-        ChatCompletionRequest request = new ChatCompletionRequestBuilder(info.model, info.history).withStream(true).build();
+        info.getHistory().add(new ChatMessage(Role.USER, message));
+        ChatCompletionRequest request = new ChatCompletionRequestBuilder(info.getModel(), info.getHistory()).withStream(true).build();
         EventStreamSubscriber subscriber = new EventStreamSubscriber();
         client.sendChatCompletionRequestWithStreamEnabled(request, subscriber);
         String messageRes = subscriber.getContent();
         messageRes = messageRes.replace("\n\n", "\n");
-        info.history.add(new ChatMessage(Role.ASSISTANT, messageRes));
-        store.save(channelId, userId, info);
+        info.getHistory().add(new ChatMessage(Role.ASSISTANT, messageRes));
+        store.putChannelInfo(info);
         return String.format("%s", messageRes);
     }
 
@@ -89,38 +89,39 @@ public class ChatGpt {
     }
 
     public ChatGptChannelInfo reset(String channelId, String userId) {
-        ChatGptChannelInfo info = store.get(channelId, userId);
-        boolean activated = false;
+        ChatGptChannelInfo info = store.getChannelInfo(null, channelId, userId);
         if (info == null) {
-            info = store.create(channelId, userId);
-        } else {
-            activated = info.activated;
-            info = store.clear(channelId, userId);
+            info = new ChatGptChannelInfo(null, channelId, userId);
+            info.setModel(DEFAULT_MODEL);
+            if (system != null) {
+                info.getHistory().add(system);
+            }
+            return store.createChannelInfo(info);
         }
-        info.model = DEFAULT_MODEL;
-        info.activated = activated;
-        info.history = new ArrayList<>();
+        info.setModel(DEFAULT_MODEL);
+        info.setHistory(new ArrayList<>());
         if (system != null) {
-            info.history.add(system);
+            info.getHistory().add(system);
         }
-        store.save(channelId, userId, info);
-        return info;
+        return store.putChannelInfo(info);
     }
 
     public void SwitchModel(String channelId, String userId, String model) {
-        ChatGptChannelInfo info = store.get(channelId, userId);
+        ChatGptChannelInfo info = store.getChannelInfo(null, channelId, userId);
         if (info == null) {
             info = reset(channelId, userId);
         }
-        info.model = model;
+        info.setModel(model);
+        store.putChannelInfo(info);
     }
 
     public void SetActivation(String channelId, String userId, Boolean activation) {
-        ChatGptChannelInfo info = store.get(channelId, userId);
+        ChatGptChannelInfo info = store.getChannelInfo(null, channelId, userId);
         if (info == null) {
             info = reset(channelId, userId);
         }
-        info.activated = activation;
+        info.setActivated(activation);
+        store.putChannelInfo(info);
     }
 
     public class EventStreamSubscriber implements Flow.Subscriber<String> {
