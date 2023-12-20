@@ -2,8 +2,17 @@ package com.buratud.data.openai;
 
 import com.buratud.data.MemberChannelData;
 import com.google.gson.annotations.SerializedName;
+import lombok.Getter;
+import lombok.Setter;
 
-public class ChatGptMetadata extends MemberChannelData {
+@Getter
+@Setter
+public final class ChatGptMetadata extends MemberChannelData {
+    public ChatGptMetadata(String guildId, String channelId, String memberId) {
+        this.guildId = guildId;
+        this.channelId = channelId;
+        this.memberId = memberId;
+    }
     @SerializedName("system_message")
-    public String systemMessage;
+    private String systemMessage;
 }

@@ -3,8 +3,12 @@ package com.buratud.interactions;
 import com.buratud.Service;
 import com.buratud.data.openai.ChatGptChannelInfo;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -91,6 +95,14 @@ public final class ChatGpt implements Handler {
     }
 
     @Override
+    public void onModalInteraction(ModalInteractionEvent event) {
+        String[] params = event.getModalId().split("_");
+        String systemMessage = event.getValues().get(0).getAsString();
+        chatGpt.setSystemMessage(params[3], params[4], systemMessage);
+        event.reply("System message set and will be applied to next session.").complete();
+    }
+
+    @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         try {
             if (chatGpt != null) {
@@ -99,6 +111,7 @@ public final class ChatGpt implements Handler {
                     case "reset" -> resetChatHistory(event);
                     case "model" -> switchModel(event);
                     case "activation" -> activate(event);
+                    case "system" -> systemMessage(event);
                     default -> event.reply("Subcommand doesn't exist.").complete();
                 }
             } else {
@@ -115,6 +128,15 @@ public final class ChatGpt implements Handler {
                 logger.error(element.toString());
             }
         }
+    }
+
+    private void systemMessage(SlashCommandInteractionEvent event) {
+        final String id = String.format("chatgpt_system_%s_%s_%s", event.getGuild().getId(), event.getChannel().getId(), event.getMember().getId());
+        String currentSystemMessage = chatGpt.getSystemMessage(event.getChannel().getId(), event.getMember().getId());
+        TextInput systemMessageInput = TextInput.create("system_message", "System Message", TextInputStyle.PARAGRAPH)
+                .setValue(currentSystemMessage).setRequired(false).build();
+        Modal modal = Modal.create(id, "System Message").addActionRow(systemMessageInput).build();
+        event.replyModal(modal).complete();
     }
 
     private void activate(SlashCommandInteractionEvent event) {
@@ -141,7 +163,12 @@ public final class ChatGpt implements Handler {
         String channelId = event.getMessageChannel().getId();
         String userId = event.getMember().getId();
         chatGpt.reset(channelId, userId);
-        event.reply("Chat history reset.").complete();
+        String systemMessage = chatGpt.getSystemMessage(channelId, userId);
+        if (systemMessage == null) {
+            event.reply("Chat history reset.").complete();
+        } else {
+            event.reply(String.format("Chat history reset.\nCurrent system message :%s", systemMessage)).complete();
+        }
     }
 
     public static CompletableFuture<String> convertInputStreamToString(CompletableFuture<InputStream> inputStreamFuture) {

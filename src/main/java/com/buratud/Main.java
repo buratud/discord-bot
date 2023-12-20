@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.SelfUser;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -56,7 +57,8 @@ public class Main extends ListenerAdapter {
                                 new SubcommandData("activation", "Set activation for continuous use.")
                                         .addOptions(new OptionData(OptionType.BOOLEAN, "activate", "Set whether to continuously use.")
                                                 .setRequired(true)
-                                        )
+                                        ),
+                                new SubcommandData("system", "Set a system message for this channel.")
                         ),
                 Commands.slash("attendance", "Attendance command.")
                         .addSubcommands(new SubcommandData("start", "Start attendance session.")
@@ -91,6 +93,17 @@ public class Main extends ListenerAdapter {
     public void onGuildVoiceUpdate(GuildVoiceUpdateEvent event) {
         executor.submit(() -> {
             attendance.onGuildVoiceUpdate(event);
+        });
+    }
+
+    @Override
+    public void onModalInteraction(ModalInteractionEvent event) {
+        executor.submit(() -> {
+            String id = event.getModalId();
+            String module = id.substring(0, id.indexOf('_'));
+            switch (module) {
+                case "chatgpt" -> chatGPT.onModalInteraction(event);
+            }
         });
     }
 

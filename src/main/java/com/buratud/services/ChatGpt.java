@@ -1,6 +1,7 @@
 package com.buratud.services;
 
 import com.buratud.data.openai.ChatGptChannelInfo;
+import com.buratud.data.openai.ChatGptMetadata;
 import com.buratud.data.openai.chat.*;
 import com.buratud.data.openai.moderation.ModerationResponse;
 import com.google.gson.Gson;
@@ -13,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Flow;
 
@@ -100,8 +102,9 @@ public class ChatGpt {
         }
         info.setModel(DEFAULT_MODEL);
         info.setHistory(new ArrayList<>());
-        if (system != null) {
-            info.getHistory().add(system);
+        String userSystemMessage = getSystemMessage(channelId, userId);
+        if (userSystemMessage != null) {
+            info.getHistory().add(new ChatMessage(Role.SYSTEM, userSystemMessage));
         }
         return store.putChannelInfo(info);
     }
@@ -122,6 +125,27 @@ public class ChatGpt {
         }
         info.setActivated(activation);
         store.putChannelInfo(info);
+    }
+
+    public String getSystemMessage(String channelId, String userId) {
+        ChatGptMetadata metadata = store.getChannelMemberMetadata(null, channelId, userId);
+        if (metadata != null) {
+            return metadata.getSystemMessage();
+        }
+        return null;
+    }
+
+    public void setSystemMessage(String channelId, String userId, String message) {
+        ChatGptMetadata metadata = store.getChannelMemberMetadata(null, channelId, userId);
+        if (metadata == null) {
+            metadata = new ChatGptMetadata(null, channelId, userId);
+        }
+        if (Objects.equals(message, "")) {
+            metadata.setSystemMessage(null);
+        } else {
+            metadata.setSystemMessage(message);
+        }
+        store.createChannelMemberMetadata(metadata);
     }
 
     public class EventStreamSubscriber implements Flow.Subscriber<String> {
