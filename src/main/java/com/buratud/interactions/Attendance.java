@@ -75,7 +75,7 @@ public class Attendance implements Handler {
         } else if (event.getChannelLeft()!=null) {
             channelId = event.getChannelLeft().getId();
         } else {
-            throw new IllegalArgumentException("Both ChannelJoined and ChannelLeft is null");
+            return;
         }
         service.AddEvent(event.getGuild().getId(), channelId, event.getMember().getId(), info);
     }
@@ -130,6 +130,12 @@ public class Attendance implements Handler {
         String session = service.EndAttendance(attendance);
         if (session != null) {
             event.reply("Attendance session stopped.").complete();
+            Path path = service.GenerateAttendanceHistory(event.getJDA(), attendance);
+            if (path != null) {
+                event.getHook().sendFiles(FileUpload.fromData(path.toFile())).complete();
+            } else {
+                event.getHook().sendMessage("Couldn't generate file.").complete();
+            }
         } else {
             event.reply("No current attendance session.").complete();
         }

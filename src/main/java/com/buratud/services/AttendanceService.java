@@ -1,6 +1,7 @@
 package com.buratud.services;
 
 import com.buratud.data.attendance.Attendance;
+import com.buratud.data.attendance.AttendanceEvent;
 import com.buratud.data.attendance.AttendanceEventInfo;
 import com.buratud.data.attendance.ChannelMetadata;
 import com.buratud.stores.dynamodb.AttendanceStore;
@@ -119,8 +120,48 @@ public class AttendanceService {
         return store.readAttendance(guildId, channelId, metadata.getCurrentSession().toString());
     }
 
-    public Path GenerateAttendanceHistory(String guildId, String channelId) throws NotImplementedException {
-        throw new NotImplementedException();
+    public Path GenerateAttendanceHistory(JDA jda, Attendance attendance) {
+        Guild guild = Objects.requireNonNull(jda.getGuildById(attendance.getGuildId()));
+        VoiceChannel channel = Objects.requireNonNull(guild.getChannelById(VoiceChannel.class, attendance.getChannelId()));
+        try (OdfSpreadsheetDocument document = OdfSpreadsheetDocument.newSpreadsheetDocument()) {
+            OdfTable table = document.getSpreadsheetTables().get(0);
+            table.setTableName("Attendance");
+            table.getCellByPosition(0, 0).setStringValue("Guild ID");
+            table.getCellByPosition(1, 0).setStringValue(guild.getId());
+            table.getCellByPosition(0, 1).setStringValue("Guild Name");
+            table.getCellByPosition(1, 1).setStringValue(guild.getName());
+            table.getCellByPosition(0, 2).setStringValue("Channel ID");
+            table.getCellByPosition(1, 2).setStringValue(channel.getId());
+            table.getCellByPosition(0, 3).setStringValue("Channel Name");
+            table.getCellByPosition(1, 3).setStringValue(channel.getName());
+            table.getCellByPosition(0, 4).setStringValue("Session ID");
+            table.getCellByPosition(1, 4).setStringValue(attendance.getId());
+            table.getCellByPosition(0, 5).setStringValue("Start Time");
+            table.getCellByPosition(1, 5).setStringValue(attendance.getStartTime().toString());
+            table.getCellByPosition(0, 6).setStringValue("End Time");
+            table.getCellByPosition(1, 6).setStringValue(attendance.getEndTime().toString());
+            table.getCellByPosition(0, 7).setStringValue("Timestamp");
+            table.getCellByPosition(1, 7).setStringValue("User ID");
+            table.getCellByPosition(2, 7).setStringValue("Username");
+            table.getCellByPosition(3, 7).setStringValue("Nickname");
+            table.getCellByPosition(4, 7).setStringValue("Event");
+            for (int i = 0; i < attendance.getLog().size(); i++) {
+                int row = i + 8;
+                AttendanceEventInfo info = attendance.getLog().get(i);
+                Member member = Objects.requireNonNull(guild.getMemberById(info.getUserId()));
+                table.getCellByPosition(0, row).setStringValue(info.getDateTime().toString());
+                table.getCellByPosition(1, row).setStringValue(member.getId());
+                table.getCellByPosition(1, row).setStringValue(member.getId());
+                table.getCellByPosition(2, row).setStringValue(member.getEffectiveName());
+                table.getCellByPosition(3, row).setStringValue(member.getNickname());
+                table.getCellByPosition(4, row).setStringValue(info.getEvent() == AttendanceEvent.IN ? "IN" : "OUT");
+            }
+            File file = File.createTempFile(String.format("%s_", guild.getId()), ".ods");
+            document.save(file);
+            return file.toPath();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public boolean AddEvent(String guildId, String channelId, String userId, AttendanceEventInfo event) {
