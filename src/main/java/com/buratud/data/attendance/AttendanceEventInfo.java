@@ -6,7 +6,9 @@ import lombok.Setter;
 import org.joda.time.DateTime;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @DynamoDbBean
 @Getter
@@ -18,12 +20,12 @@ public class AttendanceEventInfo {
     public AttendanceEventInfo(String userId, AttendanceEvent event) {
         this.userId = userId;
         this.event = event;
-        this.dateTime = LocalDateTime.now();
+        this.dateTime = Instant.now();
     }
     @SerializedName("discord_id")
     public String userId;
     @SerializedName("event")
     public AttendanceEvent event;
     @SerializedName("datetime")
-    public LocalDateTime dateTime;
+    public Instant dateTime;
 }

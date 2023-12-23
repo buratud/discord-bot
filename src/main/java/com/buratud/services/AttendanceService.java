@@ -18,6 +18,7 @@ import org.odftoolkit.odfdom.doc.table.OdfTable;
 import java.io.File;
 import java.nio.channels.Channel;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -93,7 +94,7 @@ public class AttendanceService {
         UUID id = metadata.getCurrentSession();
         metadata.setCurrentSession(null);
         Attendance attendance = store.readAttendance(guildId, channelId, id.toString());
-        attendance.setEndTime(LocalDateTime.now());
+        attendance.setEndTime(Instant.now());
         store.updateAttendanceMetadata(metadata);
         store.updateAttendance(attendance);
         return id.toString();
@@ -106,7 +107,7 @@ public class AttendanceService {
         }
         UUID id = metadata.getCurrentSession();
         metadata.setCurrentSession(null);
-        attendance.setEndTime(LocalDateTime.now());
+        attendance.setEndTime(Instant.now());
         store.updateAttendanceMetadata(metadata);
         store.updateAttendance(attendance);
         return id.toString();

@@ -13,7 +13,9 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -37,7 +39,7 @@ public class Attendance extends ChannelData {
         this.channelId = channelId;
         this.id = id;
         this.log = new ArrayList<>();
-        this.startTime = LocalDateTime.now();
+        this.startTime = Instant.now();
     }
 
     @SerializedName("id")
@@ -49,12 +51,12 @@ public class Attendance extends ChannelData {
     }
 
     @DynamoDbAttribute("start_time")
-    public LocalDateTime getStartTime() {
+    public Instant getStartTime() {
         return startTime;
     }
 
     @DynamoDbAttribute("end_time")
-    public LocalDateTime getEndTime() {
+    public Instant getEndTime() {
         return endTime;
     }
 
@@ -63,9 +65,9 @@ public class Attendance extends ChannelData {
     @SerializedName("log")
     private List<AttendanceEventInfo> log;
     @SerializedName("start_time")
-    private LocalDateTime startTime;
+    private Instant startTime;
     @SerializedName("end_time")
-    private LocalDateTime endTime;
+    private Instant endTime;
 
     @DynamoDbPartitionKey
     @DynamoDbAttribute("partition_key")
