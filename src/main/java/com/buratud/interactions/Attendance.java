@@ -80,7 +80,7 @@ public class Attendance implements Handler {
             }
             service.AddEvent(event.getGuild().getId(), channelId, event.getMember().getId(), info);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e);
             for (StackTraceElement s : e.getStackTrace()) {
                 logger.error(s);
             }

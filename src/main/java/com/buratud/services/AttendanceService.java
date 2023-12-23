@@ -175,7 +175,7 @@ public class AttendanceService {
         UUID id = metadata.getCurrentSession();
         Attendance attendance = store.readAttendance(guildId, channelId, id.toString());
         attendance.getLog().add(event);
-        store.updateAttendance(attendance);
+        store.addEvent(attendance);
         return true;
     }
 }

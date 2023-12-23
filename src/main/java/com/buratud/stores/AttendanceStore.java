@@ -13,6 +13,8 @@ public interface AttendanceStore {
 
     Attendance updateAttendance(Attendance item);
 
+    Attendance addEvent(Attendance item);
+
     void deleteAttendance(String guildId, String channelId, String id);
 
     void createAttendanceMetadata(ChannelMetadata item);
