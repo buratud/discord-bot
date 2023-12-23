@@ -5,16 +5,23 @@ import com.buratud.data.attendance.AttendanceEvent;
 import com.buratud.data.attendance.AttendanceEventInfo;
 import com.buratud.services.AttendanceService;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Attendance implements Handler {
@@ -129,6 +136,28 @@ public class Attendance implements Handler {
     }
 
     private void now(SlashCommandInteractionEvent event) {
-        event.reply("OK").complete();
+        Guild guild = event.getGuild();
+        Channel channel = Objects.requireNonNull(Objects.requireNonNull(event.getMember()).getVoiceState()).getChannel();
+        OptionMapping option = event.getOption("channel");
+        if (option != null) {
+            if (option.getChannelType() != ChannelType.VOICE) {
+                event.reply(String.format("%s is not a voice channel", option.getAsMentionable().getAsMention())).complete();
+                return;
+            }
+            channel = option.getAsChannel();
+        }
+        if (channel == null) {
+            event.reply("You haven't joined a voice channel nor provided option.").complete();
+            return;
+        }
+        event.deferReply().complete();
+        VoiceChannel voiceChannel = (VoiceChannel) channel;
+        voiceChannel.getMembers();
+        Path path = service.GenerateCurrentAttendance(voiceChannel);
+        if (path != null) {
+            event.getHook().sendFiles(FileUpload.fromData(path.toFile())).complete();
+        } else {
+            event.reply("Couldn't generate file.").complete();
+        }
     }
 }
