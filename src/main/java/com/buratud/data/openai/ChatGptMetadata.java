@@ -1,7 +1,7 @@
 package com.buratud.data.openai;
 
 import com.buratud.data.MemberChannelData;
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,9 +13,9 @@ public final class ChatGptMetadata extends MemberChannelData {
         this.channelId = channelId;
         this.memberId = memberId;
     }
-    @SerializedName("system_message")
+    @JsonProperty("system_message")
     private String systemMessage;
 
-    @SerializedName("one_shot")
+    @JsonProperty("one_shot")
     private boolean oneShot;
 }

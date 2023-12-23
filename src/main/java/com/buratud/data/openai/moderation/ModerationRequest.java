@@ -1,19 +1,15 @@
 package com.buratud.data.openai.moderation;
 
-import com.google.gson.Gson;
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+
+import com.buratud.Utility;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class ModerationRequest {
-    static {
-        gson = new Gson();
-    }
-    private static final Gson gson;
-    @Expose
-    @SerializedName("input")
+    @JsonProperty("input")
     public String input;
 
-    public String toJsonString() {
-        return gson.toJson(this);
+    public String toJsonString() throws JsonProcessingException {
+        return Utility.mapper.writeValueAsString(this);
     }
 }

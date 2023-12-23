@@ -4,6 +4,7 @@ import com.buratud.data.openai.chat.ChatCompletionRequest;
 import com.buratud.data.openai.chat.ChatCompletionResponse;
 import com.buratud.data.openai.moderation.ModerationRequest;
 import com.buratud.data.openai.moderation.ModerationResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.io.IOException;
 import java.net.URI;
@@ -45,7 +46,7 @@ public class ChatGptHttp {
         return ChatCompletionResponse.fromJson(responseStr.body());
     }
 
-    public CompletableFuture<HttpResponse<Object>> sendChatCompletionRequestWithStreamEnabled(ChatCompletionRequest body, Flow.Subscriber<? super String> subscriber) throws InterruptedException, ExecutionException {
+    public CompletableFuture<HttpResponse<Object>> sendChatCompletionRequestWithStreamEnabled(ChatCompletionRequest body, Flow.Subscriber<? super String> subscriber) throws InterruptedException, ExecutionException, JsonProcessingException {
 
         String requestBody = body.toJson();
         HttpRequest request = HttpRequest.newBuilder()

@@ -1,56 +1,57 @@
 package com.buratud.data.openai.chat;
 
-import com.google.gson.annotations.SerializedName;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ChatCompletionStreamResponse {
-    @SerializedName("id")
+    @JsonProperty("id")
     public String id;
 
-    @SerializedName("object")
+    @JsonProperty("object")
     public String object;
 
-    @SerializedName("created")
+    @JsonProperty("created")
     public long created;
 
-    @SerializedName("model")
+    @JsonProperty("model")
     public String model;
 
-    @SerializedName("system_fingerprint")
+    @JsonProperty("system_fingerprint")
     public String systemFingerprint;
 
-    @SerializedName("choices")
+    @JsonProperty("choices")
     public Choice[] choices;
 
-    @SerializedName("usage")
+    @JsonProperty("usage")
     public Usage usage;
 
     public static class Choice {
-        @SerializedName("index")
+        @JsonProperty("index")
         public int index;
 
-        @SerializedName("delta")
+        @JsonProperty("delta")
         public Message delta;
 
-        @SerializedName("finish_reason")
+        @JsonProperty("finish_reason")
         public String finishReason;
     }
 
     public static class Message {
-        @SerializedName("role")
+        @JsonProperty("role")
         public String role;
 
-        @SerializedName("content")
+        @JsonProperty("content")
         public String content;
     }
 
     public static class Usage {
-        @SerializedName("prompt_tokens")
+        @JsonProperty("prompt_tokens")
         public int promptTokens;
 
-        @SerializedName("completion_tokens")
+        @JsonProperty("completion_tokens")
         public int completionTokens;
 
-        @SerializedName("total_tokens")
+        @JsonProperty("total_tokens")
         public int totalTokens;
     }
 

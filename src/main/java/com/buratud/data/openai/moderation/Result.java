@@ -1,16 +1,16 @@
 package com.buratud.data.openai.moderation;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Map;
 
-import com.google.gson.annotations.SerializedName;
-
 public class Result {
-    @SerializedName("flagged")
+    @JsonProperty("flagged")
     public boolean flagged;
 
-    @SerializedName("categories")
+    @JsonProperty("categories")
     public Map<String, Boolean> categories;
 
-    @SerializedName("category_scores")
+    @JsonProperty("category_scores")
     public Map<String, Float> categoryScores;
 }

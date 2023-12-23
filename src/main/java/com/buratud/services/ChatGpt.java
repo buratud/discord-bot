@@ -1,10 +1,12 @@
 package com.buratud.services;
 
+import com.buratud.Utility;
 import com.buratud.data.openai.ChatGptChannelInfo;
 import com.buratud.data.openai.ChatGptMetadata;
 import com.buratud.data.openai.chat.*;
 import com.buratud.data.openai.moderation.ModerationResponse;
-import com.google.gson.Gson;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -63,7 +65,7 @@ public class ChatGpt {
         return String.format("%s\n\nTotal tokens: %d", messageRes, response.usage.totalTokens);
     }
 
-    public String sendStreamEnabled(String channelId, String userId, String message) throws InterruptedException, ExecutionException {
+    public String sendStreamEnabled(String channelId, String userId, String message) throws InterruptedException, ExecutionException, JsonProcessingException {
         ChatGptChannelInfo info = store.getChannelInfo(null, channelId, userId);
         if (info == null) {
             info = reset(channelId, userId);
@@ -164,7 +166,6 @@ public class ChatGpt {
     }
 
     public class EventStreamSubscriber implements Flow.Subscriber<String> {
-        private static final Gson gson = new Gson();
         private StringBuilder builder;
         private Flow.Subscription subscription;
 
@@ -175,6 +176,7 @@ public class ChatGpt {
             subscription.request(1);
         }
 
+        @SneakyThrows
         @Override
         public void onNext(String content) {
             logger.debug(content);
@@ -182,7 +184,7 @@ public class ChatGpt {
             if (content.contentEquals("[DONE]")) {
                 return;
             }
-            ChatCompletionStreamResponse item = gson.fromJson(content, ChatCompletionStreamResponse.class);
+            ChatCompletionStreamResponse item = Utility.mapper.readValue(content, ChatCompletionStreamResponse.class);
             if (item.choices[0].finishReason != null && item.choices[0].finishReason.equals("length")) {
                 builder.append("\nMessage is cut due to exceed of token.");
             } else if (item.choices[0].delta.content != null)

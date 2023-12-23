@@ -1,23 +1,23 @@
 package com.buratud.data.openai.moderation;
 
-import com.google.gson.annotations.SerializedName;
+import com.buratud.Utility;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.List;
 
-import com.google.gson.Gson;
 
 public class ModerationResponse {
-    @SerializedName("id")
+    @JsonProperty("id")
     public String id;
 
-    @SerializedName("model")
+    @JsonProperty("model")
     public String model;
 
-    @SerializedName("results")
+    @JsonProperty("results")
     public List<Result> results;
 
-    public static ModerationResponse fromJson(String json) {
-        Gson gson = new Gson();
-        return gson.fromJson(json, ModerationResponse.class);
+    public static ModerationResponse fromJson(String json) throws JsonProcessingException {
+        return Utility.mapper.readValue(json, ModerationResponse.class);
     }
 }

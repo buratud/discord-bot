@@ -1,55 +1,54 @@
 package com.buratud.data.openai.chat;
 
+import com.buratud.Utility;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import java.util.List;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 
 public class ChatCompletionRequest {
-    @Expose
-    @SerializedName("model")
+    
+    @JsonProperty("model")
     public String model;
 
-    @Expose
-    @SerializedName("messages")
+    
+    @JsonProperty("messages")
     public List<ChatMessage> messages;
 
-    @Expose
-    @SerializedName("temperature")
+    
+    @JsonProperty("temperature")
     public Float temperature;
 
-    @Expose
-    @SerializedName("top_p")
+    
+    @JsonProperty("top_p")
     public Float topP;
 
-    @Expose
-    @SerializedName("n")
+    
+    @JsonProperty("n")
     public Float n;
 
-    @Expose
-    @SerializedName("stream")
+    
+    @JsonProperty("stream")
     public Boolean stream;
 
-    @Expose
-    @SerializedName("maxTokens")
+    
+    @JsonProperty("maxTokens")
     public Integer maxTokens;
 
-    @Expose
-    @SerializedName("presencePenalty")
+    
+    @JsonProperty("presencePenalty")
     public Integer presencePenalty;
 
-    @Expose
-    @SerializedName("frequencyPenalty")
+    
+    @JsonProperty("frequencyPenalty")
     public Integer frequencyPenalty;
 
-    @Expose
-    @SerializedName("user")
+    
+    @JsonProperty("user")
     public String user;
 
-    public String toJson() {
-        Gson gson = new GsonBuilder().registerTypeAdapter(Role.class, new RoleSerializer()).create();
-        return gson.toJson(this);
+    public String toJson() throws JsonProcessingException {
+       return  Utility.mapper.writeValueAsString(this);
     }
 }

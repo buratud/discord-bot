@@ -2,10 +2,12 @@ package com.buratud.data.attendance;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperFieldModel;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTyped;
+import com.buratud.Utility;
 import com.buratud.data.ChannelData;
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.joda.time.DateTime;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
@@ -14,8 +16,6 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbParti
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +23,7 @@ import java.util.UUID;
 @DynamoDbBean
 @Getter
 @Setter
+@NoArgsConstructor
 public class Attendance extends ChannelData {
     public static String getPartitionKey(String guildId, String channelId) {
         return String.join("_", guildId, channelId, type);
@@ -30,8 +31,8 @@ public class Attendance extends ChannelData {
 
     public static final String type = "attendance";
 
-    public Attendance() {
-
+    public static Attendance fromJson(String json) throws JsonProcessingException {
+        return Utility.mapper.readValue(json, Attendance.class);
     }
 
     public Attendance(String guildId, String channelId, UUID id) {
@@ -42,7 +43,7 @@ public class Attendance extends ChannelData {
         this.startTime = Instant.now();
     }
 
-    @SerializedName("id")
+    @JsonProperty("id")
     private UUID id;
 
     @DynamoDbAttribute("log")
@@ -60,18 +61,18 @@ public class Attendance extends ChannelData {
         return endTime;
     }
 
-    @SerializedName("initiator_id")
+    @JsonProperty("initiator_id")
     private String initiatorId;
-    @SerializedName("log")
+    @JsonProperty("log")
     private List<AttendanceEventInfo> log;
-    @SerializedName("start_time")
+    @JsonProperty("start_time")
     private Instant startTime;
-    @SerializedName("end_time")
+    @JsonProperty("end_time")
     private Instant endTime;
 
     @DynamoDbPartitionKey
     @DynamoDbAttribute("partition_key")
-    @SerializedName("partition_key")
+    @JsonProperty("partition_key")
     public String getPartitionKey() {
         return String.join("_", guildId, channelId, type);
     }
@@ -92,9 +93,5 @@ public class Attendance extends ChannelData {
 
     public String getInitiatorId() {
         return initiatorId;
-    }
-
-    public void setInitiatorId(String initiatorId) {
-        this.initiatorId =  initiatorId;
     }
 }

@@ -1,38 +1,38 @@
 package com.buratud.data.openai.moderation;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class CategoryScores {
-    @SerializedName("sexual")
+    @JsonProperty("sexual")
     public double sexual;
 
-    @SerializedName("hate")
+    @JsonProperty("hate")
     public double hate;
 
-    @SerializedName("harassment")
+    @JsonProperty("harassment")
     public double harassment;
 
-    @SerializedName("self-harm")
+    @JsonProperty("self-harm")
     public double selfHarm;
 
-    @SerializedName("sexual/minors")
+    @JsonProperty("sexual/minors")
     public double sexualMinors;
 
-    @SerializedName("hate/threatening")
+    @JsonProperty("hate/threatening")
     public double hateThreatening;
 
-    @SerializedName("violence/graphic")
+    @JsonProperty("violence/graphic")
     public double violenceGraphic;
 
-    @SerializedName("self-harm/intent")
+    @JsonProperty("self-harm/intent")
     public double selfHarmIntent;
 
-    @SerializedName("self-harm/instructions")
+    @JsonProperty("self-harm/instructions")
     public double selfHarmInstructions;
 
-    @SerializedName("harassment/threatening")
+    @JsonProperty("harassment/threatening")
     public double harassmentThreatening;
 
-    @SerializedName("violence")
+    @JsonProperty("violence")
     public double violence;
 }

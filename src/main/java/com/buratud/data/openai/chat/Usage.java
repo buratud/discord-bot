@@ -1,17 +1,13 @@
 package com.buratud.data.openai.chat;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Usage {
-    @Expose
-    @SerializedName("prompt_tokens")
+    @JsonProperty("prompt_tokens")
     public int promptTokens;
-    @Expose
-    @SerializedName("completion_tokens")
+    @JsonProperty("completion_tokens")
     public int completionTokens;
-    @Expose
-    @SerializedName("total_tokens")
+    @JsonProperty("total_tokens")
     public int totalTokens;
 }
     
