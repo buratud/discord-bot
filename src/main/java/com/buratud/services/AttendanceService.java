@@ -20,6 +20,8 @@ import java.nio.channels.Channel;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -66,7 +68,7 @@ public class AttendanceService {
             table.getCellByPosition(0, 3).setStringValue("Channel Name");
             table.getCellByPosition(1, 3).setStringValue(channel.getName());
             table.getCellByPosition(0, 4).setStringValue("Timestamp");
-            table.getCellByPosition(1, 4).setStringValue(LocalDateTime.now().toString());
+            table.getCellByPosition(1, 4).setStringValue(ZonedDateTime.now(ZoneId.of("Asia/Bangkok")).toString());
             table.getCellByPosition(0, 5).setStringValue("User ID");
             table.getCellByPosition(1, 5).setStringValue("Username");
             table.getCellByPosition(2, 5).setStringValue("Nickname");
@@ -138,9 +140,9 @@ public class AttendanceService {
             table.getCellByPosition(0, 4).setStringValue("Session ID");
             table.getCellByPosition(1, 4).setStringValue(attendance.getId());
             table.getCellByPosition(0, 5).setStringValue("Start Time");
-            table.getCellByPosition(1, 5).setStringValue(attendance.getStartTime().toString());
+            table.getCellByPosition(1, 5).setStringValue(ZonedDateTime.ofInstant(attendance.getStartTime(), ZoneId.of("Asia/Bangkok")).toString());
             table.getCellByPosition(0, 6).setStringValue("End Time");
-            table.getCellByPosition(1, 6).setStringValue(attendance.getEndTime().toString());
+            table.getCellByPosition(1, 6).setStringValue(ZonedDateTime.ofInstant(attendance.getEndTime(), ZoneId.of("Asia/Bangkok")).toString());
             table.getCellByPosition(0, 7).setStringValue("Timestamp");
             table.getCellByPosition(1, 7).setStringValue("User ID");
             table.getCellByPosition(2, 7).setStringValue("Username");
@@ -150,7 +152,7 @@ public class AttendanceService {
                 int row = i + 8;
                 AttendanceEventInfo info = attendance.getLog().get(i);
                 Member member = Objects.requireNonNull(guild.getMemberById(info.getUserId()));
-                table.getCellByPosition(0, row).setStringValue(info.getDateTime().toString());
+                table.getCellByPosition(0, row).setStringValue(ZonedDateTime.ofInstant(info.getDateTime(), ZoneId.of("Asia/Bangkok")).toString());
                 table.getCellByPosition(1, row).setStringValue(member.getId());
                 table.getCellByPosition(1, row).setStringValue(member.getId());
                 table.getCellByPosition(2, row).setStringValue(member.getEffectiveName());
