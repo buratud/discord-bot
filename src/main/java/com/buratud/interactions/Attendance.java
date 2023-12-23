@@ -4,6 +4,7 @@ import com.buratud.Service;
 import com.buratud.data.attendance.AttendanceEvent;
 import com.buratud.data.attendance.AttendanceEventInfo;
 import com.buratud.services.AttendanceService;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
@@ -38,7 +39,7 @@ public class Attendance implements Handler {
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         try {
             String subName = event.getSubcommandName();
-            switch (subName) {
+            switch (Objects.requireNonNull(subName)) {
                 case "start" -> start(event);
                 case "stop" -> stop(event);
                 case "now" -> now(event);
@@ -64,14 +65,17 @@ public class Attendance implements Handler {
         String channelId;
         if (event.getChannelJoined() != null) {
             channelId = event.getChannelJoined().getId();
-        } else {
+        } else if (event.getChannelLeft()!=null) {
             channelId = event.getChannelLeft().getId();
+        } else {
+            throw new IllegalArgumentException("Both ChannelJoined and ChannelLeft is null");
         }
         service.AddEvent(event.getGuild().getId(), channelId, event.getMember().getId(), info);
     }
 
     private void start(SlashCommandInteractionEvent event) {
-        Channel channel = event.getMember().getVoiceState().getChannel();
+        Guild guild = event.getGuild();
+        Channel channel = Objects.requireNonNull(Objects.requireNonNull(event.getMember()).getVoiceState()).getChannel();
         OptionMapping option = event.getOption("channel");
         if (option != null) {
             if (option.getChannelType() != ChannelType.VOICE){
@@ -84,7 +88,7 @@ public class Attendance implements Handler {
             event.reply("You haven't joined a voice channel nor provided option.").complete();
             return;
         }
-        String session = service.StartAttendance(event.getGuild().getId(), channel.getId(), event.getMember().getId());
+        String session = service.StartAttendance(Objects.requireNonNull(guild).getId(), channel.getId(), event.getMember().getId());
         if (session != null) {
             event.reply("Attendance session started.").complete();
         } else {
@@ -93,7 +97,8 @@ public class Attendance implements Handler {
     }
 
     private void stop(SlashCommandInteractionEvent event) {
-        Channel channel = event.getMember().getVoiceState().getChannel();
+        Guild guild = event.getGuild();
+        Channel channel = Objects.requireNonNull(Objects.requireNonNull(event.getMember()).getVoiceState()).getChannel();
         OptionMapping option = event.getOption("channel");
         if (option != null) {
             if (option.getChannelType() != ChannelType.VOICE){
@@ -106,12 +111,12 @@ public class Attendance implements Handler {
             event.reply("You haven't joined a voice channel nor provided option.").complete();
             return;
         }
-        com.buratud.data.attendance.Attendance attendance = service.GetCurrentAttendance(event.getGuild().getId(), channel.getId());
+        com.buratud.data.attendance.Attendance attendance = service.GetCurrentAttendance(Objects.requireNonNull(guild).getId(), channel.getId());
         if (attendance == null) {
             event.reply("No current attendance session.").complete();
             return;
         }
-        if (!Objects.equals(attendance.getInitiatorId().toString(), event.getMember().getId())) {
+        if (!Objects.equals(attendance.getInitiatorId(), event.getMember().getId())) {
             event.reply("You did not start this session. This incident will be reported.").complete();
             return;
         }
