@@ -67,17 +67,24 @@ public class Attendance implements Handler {
 
     @Override
     public void onGuildVoiceUpdate(GuildVoiceUpdateEvent event) {
-        AttendanceEvent attendanceEvent = event.getChannelJoined() != null ? AttendanceEvent.IN : AttendanceEvent.OUT;
-        AttendanceEventInfo info = new AttendanceEventInfo(event.getMember().getId(), attendanceEvent);
-        String channelId;
-        if (event.getChannelJoined() != null) {
-            channelId = event.getChannelJoined().getId();
-        } else if (event.getChannelLeft()!=null) {
-            channelId = event.getChannelLeft().getId();
-        } else {
-            return;
+        try {
+            AttendanceEvent attendanceEvent = event.getChannelJoined() != null ? AttendanceEvent.IN : AttendanceEvent.OUT;
+            AttendanceEventInfo info = new AttendanceEventInfo(event.getMember().getId(), attendanceEvent);
+            String channelId;
+            if (event.getChannelJoined() != null) {
+                channelId = event.getChannelJoined().getId();
+            } else if (event.getChannelLeft() != null) {
+                channelId = event.getChannelLeft().getId();
+            } else {
+                return;
+            }
+            service.AddEvent(event.getGuild().getId(), channelId, event.getMember().getId(), info);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            for (StackTraceElement s : e.getStackTrace()) {
+                logger.error(s);
+            }
         }
-        service.AddEvent(event.getGuild().getId(), channelId, event.getMember().getId(), info);
     }
 
     private void start(SlashCommandInteractionEvent event) {
@@ -85,7 +92,7 @@ public class Attendance implements Handler {
         Channel channel = Objects.requireNonNull(Objects.requireNonNull(event.getMember()).getVoiceState()).getChannel();
         OptionMapping option = event.getOption("channel");
         if (option != null) {
-            if (option.getChannelType() != ChannelType.VOICE){
+            if (option.getChannelType() != ChannelType.VOICE) {
                 event.reply(String.format("%s is not a voice channel", option.getAsMentionable().getAsMention())).complete();
                 return;
             }
@@ -108,7 +115,7 @@ public class Attendance implements Handler {
         Channel channel = Objects.requireNonNull(Objects.requireNonNull(event.getMember()).getVoiceState()).getChannel();
         OptionMapping option = event.getOption("channel");
         if (option != null) {
-            if (option.getChannelType() != ChannelType.VOICE){
+            if (option.getChannelType() != ChannelType.VOICE) {
                 event.reply(String.format("%s is not a voice channel", option.getAsMentionable().getAsMention())).complete();
                 return;
             }
