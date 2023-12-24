@@ -3,6 +3,7 @@ package com.buratud.services;
 import com.buratud.data.googleai.ChatCompletionRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -27,7 +28,7 @@ public class GeminiHttp {
         this.streamChatUrl = String.format("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:streamGenerateContent?key=%s", apiKey);
     }
 
-    public CompletableFuture<HttpResponse<Object>> sendChatCompletionRequestWithStreamEnabled(ChatCompletionRequest body, Flow.Subscriber<? super String> subscriber) throws InterruptedException, ExecutionException, JsonProcessingException {
+    public HttpResponse<Object> sendChatCompletionRequestWithStreamEnabled(ChatCompletionRequest body, Flow.Subscriber<? super String> subscriber) throws InterruptedException, ExecutionException, IOException {
         String requestBody = body.toJson();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(streamChatUrl))
@@ -36,8 +37,6 @@ public class GeminiHttp {
                 .POST(BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
                 .build();
 
-        CompletableFuture<HttpResponse<Object>> responseFuture = client.sendAsync(request, BodyHandlers.fromLineSubscriber(subscriber, s -> null, "\n"));
-        responseFuture.get();
-        return responseFuture;
+        return client.send(request, BodyHandlers.fromLineSubscriber(subscriber, s -> null, "\n"));
     }
 }

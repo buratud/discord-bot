@@ -46,7 +46,7 @@ public class ChatGptHttp {
         return ChatCompletionResponse.fromJson(responseStr.body());
     }
 
-    public CompletableFuture<HttpResponse<Object>> sendChatCompletionRequestWithStreamEnabled(ChatCompletionRequest body, Flow.Subscriber<? super String> subscriber) throws InterruptedException, ExecutionException, JsonProcessingException {
+    public HttpResponse<Object> sendChatCompletionRequestWithStreamEnabled(ChatCompletionRequest body, Flow.Subscriber<? super String> subscriber) throws InterruptedException, ExecutionException, IOException {
 
         String requestBody = body.toJson();
         HttpRequest request = HttpRequest.newBuilder()
@@ -58,9 +58,7 @@ public class ChatGptHttp {
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
                 .build();
 
-        CompletableFuture<HttpResponse<Object>> responseFuture = client.sendAsync(request, HttpResponse.BodyHandlers.fromLineSubscriber(subscriber, s -> null, "\n\n"));
-        responseFuture.get();
-        return responseFuture;
+        return client.send(request, BodyHandlers.fromLineSubscriber(subscriber, s -> null, "\n\n"));
     }
 
     public ModerationResponse moderateMessage(String message) throws IOException, InterruptedException {
