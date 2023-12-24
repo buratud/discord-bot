@@ -8,4 +8,5 @@ import lombok.Getter;
 public  class PromptResponse {
     boolean flagged;
     String message;
+    FinishReason finishReason;
 }

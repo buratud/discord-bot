@@ -138,6 +138,6 @@ public class GenerativeAi {
             info.setHistory(messages);
             store.putChannelInfo(info);
         }
-        return new PromptResponse(false, String.format("%s", response.getMessage()));
+        return response;
     }
 }

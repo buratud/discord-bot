@@ -1,6 +1,7 @@
 package com.buratud.interactions;
 
 import com.buratud.Service;
+import com.buratud.data.ai.FinishReason;
 import com.buratud.data.ai.PromptResponse;
 import com.buratud.data.openai.ChatGptChannelInfo;
 import com.buratud.services.GenerativeAi;
@@ -72,7 +73,11 @@ public final class ChatGpt implements Handler {
                     }
                     rawMessage = replaceFileContent(rawMessage, message.getAttachments());
                     PromptResponse res = ai.sendStreamEnabled(channelId, userId, rawMessage);
-                    List<String> responses = splitResponse(res.getMessage());
+                    String responseMessage = res.getMessage();
+                    if (res.getFinishReason() != FinishReason.NORMAL && res.getFinishReason() != FinishReason.VIOLATION) {
+                        responseMessage += "\n\nMessage was cut due to " + res.getFinishReason().toString();
+                    }
+                    List<String> responses = splitResponse(responseMessage);
                     for (String response : responses) {
                         if (response.length() > 2000) {
                             message.replyFiles(convertToDiscordFile(response)).complete();

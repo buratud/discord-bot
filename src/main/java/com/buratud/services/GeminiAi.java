@@ -1,6 +1,7 @@
 package com.buratud.services;
 
 import com.buratud.Utility;
+import com.buratud.data.ai.FinishReason;
 import com.buratud.data.ai.PromptResponse;
 import com.buratud.data.openai.ChatGptChannelInfo;
 import com.buratud.data.openai.chat.ChatMessage;
@@ -32,6 +33,7 @@ public class GeminiAi {
         client.sendChatCompletionRequestWithStreamEnabled(request, subscriber);
         ChatCompletionStreamResponse[] responses = subscriber.getContent();
         StringBuilder builder = new StringBuilder();
+        FinishReason finishReason = FinishReason.NORMAL;
         for (ChatCompletionStreamResponse response : responses) {
             if (response.getPromptFeedback() != null && Objects.equals(response.getPromptFeedback().getBlockReason(), "SAFETY")) {
                 String reason = "";
@@ -41,14 +43,22 @@ public class GeminiAi {
                         break;
                     }
                 }
-                return new PromptResponse(true, String.format("Message was blocked due to %s", reason));
+                return new PromptResponse(true, String.format("Message was blocked due to %s", reason), FinishReason.VIOLATION);
             }
             if (response.getCandidates()[0].getContent() != null) {
                 builder.append(response.getCandidates()[0].getContent().getParts()[0].getText());
             }
+            if (response.getCandidates()[0].getFinishReason() != null) {
+                finishReason = switch (response.getCandidates()[0].getFinishReason()) {
+                    case "MAX_TOKENS" -> FinishReason.MAX_TOKENS;
+                    case "RECITATION" -> FinishReason.RECITATION;
+                    case "OTHER" -> FinishReason.UNKNOWN;
+                    default -> finishReason;
+                };
+            }
         }
 
-        return new PromptResponse(false, builder.toString().replace("\n\n", "\n"));
+        return new PromptResponse(false, builder.toString().replace("\n\n", "\n"), finishReason);
     }
 
     public class EventStreamSubscriber implements Flow.Subscriber<String> {
@@ -80,7 +90,6 @@ public class GeminiAi {
         }
 
         public ChatCompletionStreamResponse[] getContent() throws JsonProcessingException {
-
             return Utility.mapper.readValue(builder.toString(), ChatCompletionStreamResponse[].class);
         }
     }

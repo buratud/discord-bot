@@ -1,6 +1,7 @@
 package com.buratud.services;
 
 import com.buratud.Utility;
+import com.buratud.data.ai.FinishReason;
 import com.buratud.data.ai.PromptResponse;
 import com.buratud.data.openai.ChatGptChannelInfo;
 import com.buratud.data.openai.ChatGptMetadata;
@@ -46,14 +47,14 @@ public class ChatGpt {
         String message = messages.get(messages.size()-1).content;
         String flagged = moderationCheck(message);
         if (flagged != null) {
-            return new PromptResponse(true, String.format("Message was blocked due to %s", flagged));
+            return new PromptResponse(true, String.format("Message was blocked due to %s", flagged), FinishReason.VIOLATION);
         }
         ChatCompletionRequest request = new ChatCompletionRequestBuilder(info.getModel(), messages).withStream(true).build();
         EventStreamSubscriber subscriber = new EventStreamSubscriber();
         client.sendChatCompletionRequestWithStreamEnabled(request, subscriber);
         String messageRes = subscriber.getContent();
         messageRes = messageRes.replace("\n\n", "\n");
-        return new PromptResponse(false, String.format("%s", messageRes));
+        return new PromptResponse(false, String.format("%s", messageRes), FinishReason.NORMAL);
     }
 
     public class EventStreamSubscriber implements Flow.Subscriber<String> {
