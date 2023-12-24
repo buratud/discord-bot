@@ -1,4 +1,4 @@
-package com.buratud.googleai;
+package com.buratud.data.googleai;
 
 import com.buratud.Utility;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

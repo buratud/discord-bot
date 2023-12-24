@@ -1,4 +1,4 @@
-package com.buratud.googleai;
+package com.buratud.data.googleai;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;

@@ -1,4 +1,4 @@
-package com.buratud.googleai;
+package com.buratud.data.googleai;
 
 public enum Role {
     SYSTEM("system"),

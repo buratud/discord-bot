@@ -1,12 +1,8 @@
 package com.buratud.services;
 
-import com.buratud.data.openai.chat.ChatCompletionResponse;
-import com.buratud.data.openai.moderation.ModerationRequest;
-import com.buratud.data.openai.moderation.ModerationResponse;
-import com.buratud.googleai.ChatCompletionRequest;
+import com.buratud.data.googleai.ChatCompletionRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;

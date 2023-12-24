@@ -1,4 +1,4 @@
-package com.buratud.googleai;
+package com.buratud.data.googleai;
 
 import com.buratud.data.openai.chat.ChatMessage;
 import com.buratud.data.openai.chat.Role;
@@ -6,7 +6,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Mapper
@@ -19,13 +18,13 @@ public interface ChatCompletionRequestMapper {
     default Content map(ChatMessage value) {
         Content content = new Content();
         Role sourceRole = value.role;
-        com.buratud.googleai.Role targetRole;
+        com.buratud.data.googleai.Role targetRole;
         if (sourceRole == Role.SYSTEM) {
-            targetRole = com.buratud.googleai.Role.SYSTEM;
+            targetRole = com.buratud.data.googleai.Role.SYSTEM;
         } else if (sourceRole == Role.USER) {
-            targetRole = com.buratud.googleai.Role.USER;
+            targetRole = com.buratud.data.googleai.Role.USER;
         } else {
-            targetRole = com.buratud.googleai.Role.MODEL;
+            targetRole = com.buratud.data.googleai.Role.MODEL;
         }
         content.setRole(targetRole);
         Part part = new Part();

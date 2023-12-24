@@ -1,11 +1,13 @@
-package com.buratud.googleai;
+package com.buratud.data.googleai;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@JsonIgnoreProperties
 public class ChatCompletionStreamResponse {
     private Candidate[] candidates;
     private PromptFeedback promptFeedback;
