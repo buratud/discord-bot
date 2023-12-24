@@ -99,6 +99,7 @@ public final class ChatGpt implements Handler {
             String result = ai.chatGpt.moderationCheck(systemMessage);
             if (result != null) {
                 event.reply(String.format("System message is not set due to %s", result)).complete();
+                return;
             }
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
