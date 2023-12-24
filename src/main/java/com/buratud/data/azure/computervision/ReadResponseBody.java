@@ -12,6 +12,7 @@ public class ReadResponseBody {
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class ReadResult {
             public Line[] lines;
+            @JsonIgnoreProperties(ignoreUnknown = true)
             public static class Line {
                 public String text;
             }
