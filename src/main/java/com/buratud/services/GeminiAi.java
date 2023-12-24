@@ -43,7 +43,9 @@ public class GeminiAi {
                 }
                 return new PromptResponse(true, String.format("Message was blocked due to %s", reason));
             }
-            builder.append(response.getCandidates()[0].getContent().getParts()[0].getText());
+            if (response.getCandidates()[0].getContent() != null) {
+                builder.append(response.getCandidates()[0].getContent().getParts()[0].getText());
+            }
         }
 
         return new PromptResponse(false, builder.toString().replace("\n\n", "\n"));
