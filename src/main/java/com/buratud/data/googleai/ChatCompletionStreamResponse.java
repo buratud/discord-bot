@@ -20,6 +20,7 @@ public class ChatCompletionStreamResponse {
         private String finishReason;
         private int index;
         private SafetyRating[] safetyRatings;
+        private CitationMetadata citationMetadata;
     }
 
     @Getter
@@ -51,5 +52,22 @@ public class ChatCompletionStreamResponse {
     public static class PromptFeedback {
         private String blockReason;
         private SafetyRating[] safetyRatings;
+    }
+
+    @Getter
+    @Setter
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class CitationMetadata {
+        private CiatationSource[] citationSources;
+    }
+
+    @Getter
+    @Setter
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class CiatationSource {
+        private int startIndex;
+        private int endIndex;
+        private String uri;
+        private String license;
     }
 }
