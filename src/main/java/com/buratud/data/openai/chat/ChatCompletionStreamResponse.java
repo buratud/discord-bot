@@ -1,8 +1,11 @@
 package com.buratud.data.openai.chat;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ChatCompletionStreamResponse {
     @JsonProperty("id")
     public String id;
@@ -25,6 +28,7 @@ public class ChatCompletionStreamResponse {
     @JsonProperty("usage")
     public Usage usage;
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Choice {
         @JsonProperty("index")
         public int index;
@@ -44,6 +48,7 @@ public class ChatCompletionStreamResponse {
         public String content;
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Usage {
         @JsonProperty("prompt_tokens")
         public int promptTokens;

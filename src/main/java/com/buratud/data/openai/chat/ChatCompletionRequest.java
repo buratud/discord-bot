@@ -33,15 +33,15 @@ public class ChatCompletionRequest {
     public Boolean stream;
 
     
-    @JsonProperty("maxTokens")
+    @JsonProperty("max_tokens")
     public Integer maxTokens;
 
     
-    @JsonProperty("presencePenalty")
+    @JsonProperty("presence_penalty")
     public Integer presencePenalty;
 
     
-    @JsonProperty("frequencyPenalty")
+    @JsonProperty("frequency_penalty")
     public Integer frequencyPenalty;
 
     
