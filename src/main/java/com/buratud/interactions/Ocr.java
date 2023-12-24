@@ -31,8 +31,12 @@ public class Ocr implements Handler {
     public void onMessageContextInteraction(@NotNull MessageContextInteractionEvent event) {
         try {
             ocr(event);
-        } catch (IOException | InterruptedException e) {
-            event.reply("Something went wrong, try again later.").complete();
+        } catch (Exception e) {
+           if (event.isAcknowledged()) {
+               event.getHook().sendMessage("Something went wrong, try again later.").complete();
+           } else {
+               event.reply("Something went wrong, try again later.").complete();
+           }
             logger.error(e);
             for (StackTraceElement element : e.getStackTrace()) {
                 logger.error(element.toString());
