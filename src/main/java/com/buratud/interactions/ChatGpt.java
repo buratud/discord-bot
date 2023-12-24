@@ -166,7 +166,11 @@ public final class ChatGpt implements Handler {
         String userId = event.getMember().getId();
         String model = event.getOption("model").getAsString();
         ai.SwitchModel(channelId, userId, model);
-        event.reply(String.format("Switched to %s model.", model)).complete();
+        String message = String.format("Switched to %s model.", model);
+        if (model.startsWith("gemini")) {
+            message += "\nPlease not that currently Gemini AI **collects your prompt**, so don't type any info you don't want to be collected.\nAlso, there is **no system message for this model**.";
+        }
+        event.reply(message).complete();
     }
 
     private void resetChatHistory(SlashCommandInteractionEvent event) {

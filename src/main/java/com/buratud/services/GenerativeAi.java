@@ -57,7 +57,9 @@ public class GenerativeAi {
             }
             return store.createChannelInfo(info);
         }
-        info.setModel(DEFAULT_MODEL);
+        if (Objects.equals(info.getModel(), "gpt-4-1106-preview")){
+            info.setModel("gpt-3.5-turbo-1106");
+        }
         info.setHistory(new ArrayList<>());
         String userSystemMessage = getSystemMessage(channelId, userId);
         if (userSystemMessage != null) {
