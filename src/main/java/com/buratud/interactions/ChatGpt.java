@@ -177,7 +177,12 @@ public final class ChatGpt implements Handler {
         ai.SwitchModel(channelId, userId, model);
         String message = String.format("Switched to %s model.", model);
         if (model.startsWith("gemini")) {
-            message += "\nPlease not that currently Gemini AI **collects your prompt**, so don't type any info you don't want to be collected.\nAlso, there is **no system message for this model**.";
+            message += """
+
+                    Please not that currently Gemini AI **collects your prompt**, so don't type any info you don't want to be collected.
+                    Also, there is **no system message for this model**.
+
+                    Currently this model in incapable of generating code so you might get error from time to time.""";
         }
         event.reply(message).complete();
     }
