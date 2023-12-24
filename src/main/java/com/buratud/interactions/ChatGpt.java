@@ -3,6 +3,7 @@ package com.buratud.interactions;
 import com.buratud.Service;
 import com.buratud.data.ai.PromptResponse;
 import com.buratud.data.openai.ChatGptChannelInfo;
+import com.buratud.services.GenerativeAi;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -31,7 +32,7 @@ import java.util.regex.Pattern;
 public final class ChatGpt implements Handler {
     private static final Logger logger = LogManager.getLogger(ChatGpt.class);
     private static ChatGpt instance;
-    private final com.buratud.services.ChatGpt chatGpt;
+    private final GenerativeAi ai;
     private static final HashMap<String, String> fileExtMap;
 
     static {
@@ -40,7 +41,7 @@ public final class ChatGpt implements Handler {
 
     private ChatGpt() throws IOException {
         Service service = Service.getInstance();
-        chatGpt = service.chatgpt;
+        ai = service.generativeAi;
     }
 
     public static synchronized ChatGpt getInstance() throws IOException {
@@ -53,7 +54,7 @@ public final class ChatGpt implements Handler {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        if (chatGpt != null) {
+        if (ai != null) {
             try {
                 if (event.getAuthor().isBot()) {
                     return;
@@ -62,7 +63,7 @@ public final class ChatGpt implements Handler {
                 String rawMessage = message.getContentRaw();
                 String channelId = event.getChannel().getId();
                 String userId = event.getAuthor().getId();
-                ChatGptChannelInfo info = chatGpt.getInfo(channelId, userId);
+                ChatGptChannelInfo info = ai.getInfo(channelId, userId);
                 if (message.getMentions().isMentioned(event.getJDA().getSelfUser()) || info != null && info.isActivated()) {
                     if (message.getMentions().isMentioned(event.getJDA().getSelfUser())) {
                         int pos = rawMessage.indexOf(String.format("<@%s>", event.getJDA().getSelfUser().getId()));
@@ -70,7 +71,7 @@ public final class ChatGpt implements Handler {
                         rawMessage = rawMessage.substring(lastPos + 1).trim();
                     }
                     rawMessage = replaceFileContent(rawMessage, message.getAttachments());
-                    PromptResponse res = chatGpt.sendStreamEnabled(channelId, userId, rawMessage);
+                    PromptResponse res = ai.sendStreamEnabled(channelId, userId, rawMessage);
                     List<String> responses = splitResponse(res.getMessage());
                     for (String response : responses) {
                         if (response.length() > 2000) {
@@ -94,14 +95,14 @@ public final class ChatGpt implements Handler {
     public void onModalInteraction(ModalInteractionEvent event) {
         String[] params = event.getModalId().split("_");
         String systemMessage = event.getValues().get(0).getAsString();
-        chatGpt.setSystemMessage(params[3], params[4], systemMessage);
+        ai.setSystemMessage(params[3], params[4], systemMessage);
         event.reply("System message set and will be applied to next session.").complete();
     }
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         try {
-            if (chatGpt != null) {
+            if (ai != null) {
                 String subName = event.getSubcommandName();
                 switch (subName) {
                     case "reset" -> resetChatHistory(event);
@@ -129,7 +130,7 @@ public final class ChatGpt implements Handler {
 
     private void systemMessage(SlashCommandInteractionEvent event) {
         final String id = String.format("chatgpt_system_%s_%s_%s", event.getGuild().getId(), event.getChannel().getId(), event.getMember().getId());
-        String currentSystemMessage = chatGpt.getSystemMessage(event.getChannel().getId(), event.getMember().getId());
+        String currentSystemMessage = ai.getSystemMessage(event.getChannel().getId(), event.getMember().getId());
         TextInput systemMessageInput = TextInput.create("system_message", "System Message", TextInputStyle.PARAGRAPH)
                 .setValue(currentSystemMessage).setRequired(false).build();
         Modal modal = Modal.create(id, "System Message").addActionRow(systemMessageInput).build();
@@ -140,7 +141,7 @@ public final class ChatGpt implements Handler {
         String channelId = event.getMessageChannel().getId();
         String userId = event.getMember().getId();
         Boolean activation = event.getOption("activate").getAsBoolean();
-        chatGpt.SetActivation(channelId, userId, activation);
+        ai.SetActivation(channelId, userId, activation);
         if (activation) {
             event.reply("Activated.").complete();
         } else {
@@ -152,7 +153,7 @@ public final class ChatGpt implements Handler {
         String channelId = event.getMessageChannel().getId();
         String userId = event.getMember().getId();
         Boolean activation = event.getOption("activate").getAsBoolean();
-        chatGpt.SetOneShot(channelId, userId, activation);
+        ai.SetOneShot(channelId, userId, activation);
         if (activation) {
             event.reply("Activated. The response will not be saved from now on.").complete();
         } else {
@@ -164,15 +165,15 @@ public final class ChatGpt implements Handler {
         String channelId = event.getMessageChannel().getId();
         String userId = event.getMember().getId();
         String model = event.getOption("model").getAsString();
-        chatGpt.SwitchModel(channelId, userId, model);
+        ai.SwitchModel(channelId, userId, model);
         event.reply(String.format("Switched to %s model.", model)).complete();
     }
 
     private void resetChatHistory(SlashCommandInteractionEvent event) {
         String channelId = event.getMessageChannel().getId();
         String userId = event.getMember().getId();
-        chatGpt.reset(channelId, userId);
-        String systemMessage = chatGpt.getSystemMessage(channelId, userId);
+        ai.reset(channelId, userId);
+        String systemMessage = ai.getSystemMessage(channelId, userId);
         if (systemMessage == null) {
             event.reply("Chat history reset.").complete();
         } else {
