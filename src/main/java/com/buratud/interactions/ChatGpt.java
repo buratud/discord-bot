@@ -182,7 +182,7 @@ public final class ChatGpt implements Handler {
                     Please not that currently Gemini AI **collects your prompt**, so don't type any info you don't want to be collected.
                     Also, there is **no system message for this model**.
 
-                    Currently this model in incapable of generating code so you might get error from time to time.""";
+                    Currently this model is incapable of generating code so you might get error from time to time.""";
         }
         event.reply(message).complete();
     }
