@@ -35,7 +35,7 @@ public class ChatGpt {
         if (response.results.get(0).flagged) {
             for (Map.Entry<String, Boolean> item : response.results.get(0).categories.entrySet()) {
                 if (item.getValue()) {
-                    return String.format("Message was blocked due to %s", item.getKey());
+                    return item.getKey();
                 }
             }
         }
@@ -46,7 +46,7 @@ public class ChatGpt {
         String message = messages.get(messages.size()-1).content;
         String flagged = moderationCheck(message);
         if (flagged != null) {
-            return new PromptResponse(true, flagged);
+            return new PromptResponse(true, String.format("Message was blocked due to %s", flagged));
         }
         ChatCompletionRequest request = new ChatCompletionRequestBuilder(info.getModel(), messages).withStream(true).build();
         EventStreamSubscriber subscriber = new EventStreamSubscriber();

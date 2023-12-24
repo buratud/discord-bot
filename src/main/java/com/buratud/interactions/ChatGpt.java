@@ -95,6 +95,14 @@ public final class ChatGpt implements Handler {
     public void onModalInteraction(ModalInteractionEvent event) {
         String[] params = event.getModalId().split("_");
         String systemMessage = event.getValues().get(0).getAsString();
+        try {
+            String result = ai.chatGpt.moderationCheck(systemMessage);
+            if (result != null) {
+                event.reply(String.format("System message is not set due to %s", result)).complete();
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         ai.setSystemMessage(params[3], params[4], systemMessage);
         event.reply("System message set and will be applied to next session.").complete();
     }

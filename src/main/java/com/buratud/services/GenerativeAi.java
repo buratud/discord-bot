@@ -22,7 +22,7 @@ public class GenerativeAi {
     private static final String DEFAULT_MODEL = "gpt-3.5-turbo-1106";
     private static final String SYSTEM_MESSAGE_FILE = "./system_message.txt";
 
-    private final ChatGpt chatGpt;
+    public final ChatGpt chatGpt;
     private final GeminiAi gemini;
     public GenerativeAi() throws IOException {
         store = new com.buratud.stores.ephemeral.ChatGpt();
