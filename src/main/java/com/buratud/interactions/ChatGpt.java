@@ -5,6 +5,7 @@ import com.buratud.data.ai.FinishReason;
 import com.buratud.data.ai.PromptResponse;
 import com.buratud.data.openai.ChatGptChannelInfo;
 import com.buratud.services.GenerativeAi;
+import com.buratud.services.TypingManager;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -36,9 +37,11 @@ public final class ChatGpt implements Handler {
     private static ChatGpt instance;
     private final GenerativeAi ai;
     private static final HashMap<String, String> fileExtMap;
+    private static final TypingManager typingManager;
 
     static {
         fileExtMap = createFileExtensionMap();
+        typingManager = TypingManager.Companion.getInstance();
     }
 
     private ChatGpt() throws IOException {
@@ -67,6 +70,7 @@ public final class ChatGpt implements Handler {
                 String userId = event.getAuthor().getId();
                 ChatGptChannelInfo info = ai.getInfo(channelId, userId);
                 if (message.getMentions().isMentioned(event.getJDA().getSelfUser()) || info != null && info.isActivated()) {
+                    typingManager.increase(event.getGuildChannel());
                     if (message.getMentions().isMentioned(event.getJDA().getSelfUser())) {
                         int pos = rawMessage.indexOf(String.format("<@%s>", event.getJDA().getSelfUser().getId()));
                         int lastPos = rawMessage.indexOf('>', pos);
@@ -100,6 +104,8 @@ public final class ChatGpt implements Handler {
                 for (StackTraceElement element : e.getStackTrace()) {
                     logger.error(element.toString());
                 }
+            } finally {
+                typingManager.decrease(event.getGuildChannel());
             }
         }
     }
