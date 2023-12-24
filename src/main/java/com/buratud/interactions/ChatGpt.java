@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.http.HttpTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,7 +87,14 @@ public final class ChatGpt implements Handler {
                         }
                     }
                 }
-            } catch (Exception e) {
+            } catch (HttpTimeoutException e) {
+                event.getMessage().reply("Timeout: generative AI server didn't response after 5 seconds.").complete();
+                logger.error(e);
+                for (StackTraceElement element : e.getStackTrace()) {
+                    logger.error(element.toString());
+                }
+            }
+            catch (Exception e) {
                 event.getMessage().reply("Something went wrong, try again later.").complete();
                 logger.error(e);
                 for (StackTraceElement element : e.getStackTrace()) {
