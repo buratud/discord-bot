@@ -52,6 +52,7 @@ public class Main extends ListenerAdapter {
                                         .addOptions(new OptionData(OptionType.STRING, "model", "Set model")
                                                 .addChoice("gpt-3.5-turbo-1106", "gpt-3.5-turbo-1106")
                                                 .addChoice("gpt-4-1106-preview", "gpt-4-1106-preview")
+                                                .addChoice("gemini-pro", "gemini-pro")
                                                 .setRequired(true)
                                         ),
                                 new SubcommandData("activation", "Set activation for continuous use.")

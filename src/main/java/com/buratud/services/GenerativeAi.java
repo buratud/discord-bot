@@ -23,10 +23,12 @@ public class GenerativeAi {
     private static final String SYSTEM_MESSAGE_FILE = "./system_message.txt";
 
     private final ChatGpt chatGpt;
+    private final GeminiAi gemini;
     public GenerativeAi() throws IOException {
         store = new com.buratud.stores.ephemeral.ChatGpt();
         readSystemMessage();
         chatGpt = new ChatGpt(Env.OPENAI_API_KEY);
+        gemini = new GeminiAi(Env.GEMINI_API_KEY);
     }
 
 
@@ -119,7 +121,12 @@ public class GenerativeAi {
         }
         List<ChatMessage> messages = new ArrayList<>(List.copyOf(info.getHistory()).stream().toList());
         messages.add(new ChatMessage(Role.USER, message));
-        PromptResponse response = chatGpt.sendStreamEnabled(info, messages);
+        PromptResponse response;
+        if (info.getModel().startsWith("gpt")) {
+            response = chatGpt.sendStreamEnabled(info, messages);
+        } else {
+            response = gemini.sendStreamEnabled(info, messages);
+        }
         if (response.isFlagged()) {
             return response;
         }

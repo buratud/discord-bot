@@ -5,4 +5,5 @@ public class Env {
     public static String AZURE_VISION_ENDPOINT = System.getenv("AZURE_VISION_ENDPOINT");
     public static String AZURE_VISION_KEY = System.getenv("AZURE_VISION_KEY");
     public static String OPENAI_API_KEY = System.getenv("OPENAI_API_KEY");
+    public static String GEMINI_API_KEY = System.getenv("GEMINI_API_KEY");
 }
