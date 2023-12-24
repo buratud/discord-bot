@@ -102,7 +102,8 @@ public class Attendance implements Handler {
             event.reply("You haven't joined a voice channel nor provided option.").complete();
             return;
         }
-        String session = service.StartAttendance(Objects.requireNonNull(guild).getId(), channel.getId(), event.getMember().getId());
+        VoiceChannel voiceChannel = (VoiceChannel) channel;
+        String session = service.StartAttendance(Objects.requireNonNull(guild).getId(), channel.getId(), event.getMember().getId(), voiceChannel.getMembers());
         if (session != null) {
             event.reply("Attendance session started.").complete();
         } else {

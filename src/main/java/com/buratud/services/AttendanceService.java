@@ -35,7 +35,7 @@ public class AttendanceService {
     }
 
     // Return session id if success
-    public String StartAttendance(String guildId, String channelId, String initiatorId) {
+    public String StartAttendance(String guildId, String channelId, String initiatorId, List<Member> members) {
         ChannelMetadata metadata = store.readAttendanceMetadata(guildId, channelId);
         UUID id = UUID.randomUUID();
         if (metadata == null) {
@@ -45,6 +45,11 @@ public class AttendanceService {
             metadata.setCurrentSession(id);
             Attendance attendance = new Attendance(guildId, channelId, id);
             attendance.setInitiatorId(initiatorId);
+            for (Member member : members) {
+                AttendanceEventInfo info = new AttendanceEventInfo(member.getId(), AttendanceEvent.IN);
+                info.setDateTime(attendance.getStartTime());
+                attendance.getLog().add(info);
+            }
             store.createAttendanceMetadata(metadata);
             store.createAttendance(attendance);
             return id.toString();
