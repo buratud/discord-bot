@@ -14,6 +14,7 @@ public class ChatCompletionStreamResponse {
 
     @Getter
     @Setter
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Candidate {
         private Content content;
         private String finishReason;
@@ -23,6 +24,7 @@ public class ChatCompletionStreamResponse {
 
     @Getter
     @Setter
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Content {
         private Part[] parts;
         private String role;
@@ -30,12 +32,14 @@ public class ChatCompletionStreamResponse {
 
     @Getter
     @Setter
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Part {
         private String text;
     }
 
     @Getter
     @Setter
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class SafetyRating {
         private String category;
         private String probability;
@@ -43,6 +47,7 @@ public class ChatCompletionStreamResponse {
 
     @Getter
     @Setter
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PromptFeedback {
         private String blockReason;
         private SafetyRating[] safetyRatings;
