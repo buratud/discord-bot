@@ -1,6 +1,7 @@
 package com.buratud.services;
 
 import com.buratud.Utility;
+import com.buratud.data.ai.PromptResponse;
 import com.buratud.data.openai.ChatGptChannelInfo;
 import com.buratud.data.openai.ChatGptMetadata;
 import com.buratud.data.openai.chat.*;
@@ -65,10 +66,14 @@ public class ChatGpt {
         return String.format("%s\n\nTotal tokens: %d", messageRes, response.usage.totalTokens);
     }
 
-    public String sendStreamEnabled(String channelId, String userId, String message) throws InterruptedException, ExecutionException, JsonProcessingException {
+    public PromptResponse sendStreamEnabled(String channelId, String userId, String message) throws InterruptedException, ExecutionException, IOException {
         ChatGptChannelInfo info = store.getChannelInfo(null, channelId, userId);
         if (info == null) {
             info = reset(channelId, userId);
+        }
+        String flagged = moderationCheck(message);
+        if (flagged != null) {
+            return new PromptResponse(true, flagged);
         }
         List<ChatMessage> messages = new ArrayList<>(List.copyOf(info.getHistory()).stream().toList());
         messages.add(new ChatMessage(Role.USER, message));
@@ -83,7 +88,7 @@ public class ChatGpt {
             info.setHistory(messages);
             store.putChannelInfo(info);
         }
-        return String.format("%s", messageRes);
+        return new PromptResponse(false, String.format("%s", messageRes));
     }
 
     public String moderationCheck(String message) throws IOException, InterruptedException {

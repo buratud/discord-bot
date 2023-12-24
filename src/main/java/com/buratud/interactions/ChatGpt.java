@@ -1,6 +1,7 @@
 package com.buratud.interactions;
 
 import com.buratud.Service;
+import com.buratud.data.ai.PromptResponse;
 import com.buratud.data.openai.ChatGptChannelInfo;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -69,13 +70,8 @@ public final class ChatGpt implements Handler {
                         rawMessage = rawMessage.substring(lastPos + 1).trim();
                     }
                     rawMessage = replaceFileContent(rawMessage, message.getAttachments());
-                    String flagged = chatGpt.moderationCheck(rawMessage);
-                    if (flagged != null) {
-                        message.reply(flagged).complete();
-                        return;
-                    }
-                    String res = chatGpt.sendStreamEnabled(channelId, userId, rawMessage);
-                    List<String> responses = splitResponse(res);
+                    PromptResponse res = chatGpt.sendStreamEnabled(channelId, userId, rawMessage);
+                    List<String> responses = splitResponse(res.getMessage());
                     for (String response : responses) {
                         if (response.length() > 2000) {
                             message.replyFiles(convertToDiscordFile(response)).complete();
