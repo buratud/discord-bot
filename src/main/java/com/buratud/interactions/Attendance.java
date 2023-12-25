@@ -111,7 +111,7 @@ public class Attendance implements Handler {
         }
     }
 
-    private void stop(SlashCommandInteractionEvent event) {
+    private void stop(SlashCommandInteractionEvent event) throws Exception {
         Guild guild = event.getGuild();
         Channel channel = Objects.requireNonNull(Objects.requireNonNull(event.getMember()).getVoiceState()).getChannel();
         OptionMapping option = event.getOption("channel");

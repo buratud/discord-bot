@@ -128,10 +128,10 @@ public class AttendanceService {
         return store.readAttendance(guildId, channelId, metadata.getCurrentSession().toString());
     }
 
-    public Path GenerateAttendanceHistory(JDA jda, Attendance attendance) {
+    public Path GenerateAttendanceHistory(JDA jda, Attendance attendance) throws Exception {
         Guild guild = Objects.requireNonNull(jda.getGuildById(attendance.getGuildId()));
         VoiceChannel channel = Objects.requireNonNull(guild.getChannelById(VoiceChannel.class, attendance.getChannelId()));
-        try (OdfSpreadsheetDocument document = OdfSpreadsheetDocument.newSpreadsheetDocument()) {
+        OdfSpreadsheetDocument document = OdfSpreadsheetDocument.newSpreadsheetDocument();
             OdfTable table = document.getSpreadsheetTables().get(0);
             table.setTableName("Attendance");
             table.getCellByPosition(0, 0).setStringValue("Guild ID");
@@ -166,10 +166,8 @@ public class AttendanceService {
             }
             File file = File.createTempFile(String.format("%s_", guild.getId()), ".ods");
             document.save(file);
+            document.close();
             return file.toPath();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public boolean AddEvent(String guildId, String channelId, String userId, AttendanceEventInfo event) {
