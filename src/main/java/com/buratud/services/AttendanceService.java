@@ -156,7 +156,11 @@ public class AttendanceService {
             for (int i = 0; i < attendance.getLog().size(); i++) {
                 int row = i + 8;
                 AttendanceEventInfo info = attendance.getLog().get(i);
-                Member member = Objects.requireNonNull(guild.getMemberById(info.getUserId()));
+                Member member = guild.getMemberById(info.getUserId());
+                if (member == null) {
+                    guild.loadMembers().get();
+                }
+                member = Objects.requireNonNull(guild.getMemberById(info.getUserId()));
                 table.getCellByPosition(0, row).setStringValue(ZonedDateTime.ofInstant(info.getDateTime(), ZoneId.of("Asia/Bangkok")).toString());
                 table.getCellByPosition(1, row).setStringValue(member.getId());
                 table.getCellByPosition(1, row).setStringValue(member.getId());
