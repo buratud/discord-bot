@@ -69,7 +69,8 @@ public final class ChatGpt implements Handler {
                 String channelId = event.getChannel().getId();
                 String userId = event.getAuthor().getId();
                 ChatGptChannelInfo info = ai.getInfo(channelId, userId);
-                if (message.getMentions().isMentioned(event.getJDA().getSelfUser()) || info != null && info.isActivated()) {
+                if (!message.getMentions().mentionsEveryone() &&
+                        (message.getMentions().isMentioned(event.getJDA().getSelfUser()) || info != null && info.isActivated())) {
                     typingManager.increase(event.getGuildChannel());
                     if (message.getMentions().isMentioned(event.getJDA().getSelfUser())) {
                         int pos = rawMessage.indexOf(String.format("<@%s>", event.getJDA().getSelfUser().getId()));
