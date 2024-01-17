@@ -65,17 +65,16 @@ public class AttendanceStore implements com.buratud.stores.AttendanceStore {
     @Override
     public Attendance addEvent(Attendance item) {
         Map<String, AttributeValue> map = new HashMap<>();
-        AttendanceEventInfo info = item.getLog().get(item.getLog().size()-1);
+        AttendanceEventInfo info = item.getLog().get(item.getLog().size() - 1);
         map.put("datetime", AttributeValue.builder().s(info.getDateTime().toString()).build());
         map.put("event", AttributeValue.builder().s(info.getEvent().toString()).build());
         map.put("user_id", AttributeValue.builder().s(info.getUserId()).build());
-        List<Map<String, AttributeValue>> list = List.of(map);
         UpdateItemRequest updateItemRequest = UpdateItemRequest.builder()
                 .tableName("discord-bot")
                 .key(Map.of("id", AttributeValue.builder().s(item.getId()).build(), "partition_key", AttributeValue.builder().s(item.getPartitionKey()).build()))
                 .updateExpression("SET #ri = list_append(#ri, :val)")
                 .expressionAttributeNames(Map.of("#ri", "log"))
-                .expressionAttributeValues(Map.of(":val", AttributeValue.builder().m(map).build()))
+                .expressionAttributeValues(Map.of(":val", AttributeValue.fromL(List.of(AttributeValue.fromM(map)))))
                 .returnValues(ReturnValue.ALL_NEW)
                 .build();
         UpdateItemResponse outcome = db.updateItem(updateItemRequest);
