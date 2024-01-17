@@ -117,7 +117,9 @@ public class AttendanceStore implements com.buratud.stores.AttendanceStore {
         attendance.setChannelId(map.get("channel_id").s());
         attendance.setInitiatorId(map.get("initiator_id").s());
         attendance.setStartTime(Instant.parse(map.get("start_time").s()));
-        attendance.setEndTime(Instant.parse(map.get("end_time").s()));
+        if (map.containsKey("end_time")) {
+            attendance.setEndTime(Instant.parse(map.get("end_time").s()));
+        }
         attendance.setLog(map.get("log").l().stream().map(s -> {
             AttendanceEventInfo info = new AttendanceEventInfo();
             info.setDateTime(Instant.parse(s.m().get("datetime").s()));
