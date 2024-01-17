@@ -71,9 +71,9 @@ public class AttendanceStore implements com.buratud.stores.AttendanceStore {
         map.put("user_id", AttributeValue.builder().s(info.getUserId()).build());
         List<Map<String, AttributeValue>> list = List.of(map);
         UpdateItemRequest updateItemRequest = UpdateItemRequest.builder()
-                .tableName("your_table_name")
+                .tableName("discord-bot")
                 .key(Map.of("id", AttributeValue.builder().s(item.getId()).build(), "partition_key", AttributeValue.builder().s(item.getPartitionKey()).build()))
-                .updateExpression("SET #ri = list_append(#ri, :val")
+                .updateExpression("SET #ri = list_append(#ri, :val)")
                 .expressionAttributeNames(Map.of("#ri", "log"))
                 .expressionAttributeValues(Map.of(":val", AttributeValue.builder().m(map).build()))
                 .returnValues(ReturnValue.ALL_NEW)
