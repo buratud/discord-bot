@@ -1,8 +1,7 @@
 package com.buratud.stores;
 
-import com.buratud.data.openai.ChatGptChannelInfo;
-import com.buratud.data.openai.ChatGptMetadata;
-import com.buratud.data.openai.chat.ChatMessage;
+import com.buratud.entity.openai.ChatGptChannelInfo;
+import com.buratud.entity.openai.ChatGptMetadata;
 
 public interface ChatGpt {
     ChatGptChannelInfo getChannelInfo(String guildId, String channelId, String userId);

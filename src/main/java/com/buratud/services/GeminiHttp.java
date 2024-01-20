@@ -1,7 +1,6 @@
 package com.buratud.services;
 
-import com.buratud.data.googleai.ChatCompletionRequest;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.buratud.entity.googleai.ChatCompletionRequest;
 
 import java.io.IOException;
 import java.net.URI;
@@ -12,7 +11,6 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Flow;
 

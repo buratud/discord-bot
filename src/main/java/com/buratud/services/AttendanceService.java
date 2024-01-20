@@ -1,25 +1,22 @@
 package com.buratud.services;
 
-import com.buratud.data.attendance.Attendance;
-import com.buratud.data.attendance.AttendanceEvent;
-import com.buratud.data.attendance.AttendanceEventInfo;
-import com.buratud.data.attendance.ChannelMetadata;
+import com.buratud.entity.attendance.Attendance;
+import com.buratud.entity.attendance.AttendanceEvent;
+import com.buratud.entity.attendance.AttendanceEventInfo;
+import com.buratud.entity.attendance.ChannelMetadata;
 import com.buratud.stores.dynamodb.AttendanceStore;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
-import org.apache.hc.core5.http.NotImplementedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument;
 import org.odftoolkit.odfdom.doc.table.OdfTable;
 
 import java.io.File;
-import java.nio.channels.Channel;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;

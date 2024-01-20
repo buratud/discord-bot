@@ -1,8 +1,8 @@
 package com.buratud.services;
 
 import com.buratud.Utility;
-import com.buratud.data.azure.computervision.ReadRequest;
-import com.buratud.data.azure.computervision.ReadResponseBody;
+import com.buratud.entity.azure.computervision.ReadRequest;
+import com.buratud.entity.azure.computervision.ReadResponseBody;
 
 import java.io.IOException;
 import java.net.URI;

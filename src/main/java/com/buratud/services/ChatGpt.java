@@ -1,25 +1,18 @@
 package com.buratud.services;
 
 import com.buratud.Utility;
-import com.buratud.data.ai.FinishReason;
-import com.buratud.data.ai.PromptResponse;
-import com.buratud.data.openai.ChatGptChannelInfo;
-import com.buratud.data.openai.ChatGptMetadata;
-import com.buratud.data.openai.chat.*;
-import com.buratud.data.openai.moderation.ModerationResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.buratud.entity.ai.FinishReason;
+import com.buratud.entity.ai.PromptResponse;
+import com.buratud.entity.openai.ChatGptChannelInfo;
+import com.buratud.entity.openai.chat.*;
+import com.buratud.entity.openai.moderation.ModerationResponse;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Flow;
 

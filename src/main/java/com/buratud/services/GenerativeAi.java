@@ -1,11 +1,11 @@
 package com.buratud.services;
 
 import com.buratud.Env;
-import com.buratud.data.ai.PromptResponse;
-import com.buratud.data.openai.ChatGptChannelInfo;
-import com.buratud.data.openai.ChatGptMetadata;
-import com.buratud.data.openai.chat.ChatMessage;
-import com.buratud.data.openai.chat.Role;
+import com.buratud.entity.ai.PromptResponse;
+import com.buratud.entity.openai.ChatGptChannelInfo;
+import com.buratud.entity.openai.ChatGptMetadata;
+import com.buratud.entity.openai.chat.ChatMessage;
+import com.buratud.entity.openai.chat.Role;
 
 import java.io.IOException;
 import java.nio.file.Files;

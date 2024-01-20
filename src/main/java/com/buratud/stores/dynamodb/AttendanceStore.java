@@ -1,15 +1,14 @@
 package com.buratud.stores.dynamodb;
 
 import com.buratud.Env;
-import com.buratud.data.attendance.Attendance;
-import com.buratud.data.attendance.AttendanceEvent;
-import com.buratud.data.attendance.AttendanceEventInfo;
-import com.buratud.data.attendance.ChannelMetadata;
+import com.buratud.entity.attendance.Attendance;
+import com.buratud.entity.attendance.AttendanceEvent;
+import com.buratud.entity.attendance.AttendanceEventInfo;
+import com.buratud.entity.attendance.ChannelMetadata;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;

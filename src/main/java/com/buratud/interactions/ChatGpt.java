@@ -1,9 +1,9 @@
 package com.buratud.interactions;
 
 import com.buratud.Service;
-import com.buratud.data.ai.FinishReason;
-import com.buratud.data.ai.PromptResponse;
-import com.buratud.data.openai.ChatGptChannelInfo;
+import com.buratud.entity.ai.FinishReason;
+import com.buratud.entity.ai.PromptResponse;
+import com.buratud.entity.openai.ChatGptChannelInfo;
 import com.buratud.services.GenerativeAi;
 import com.buratud.services.TypingManager;
 import net.dv8tion.jda.api.entities.Message;

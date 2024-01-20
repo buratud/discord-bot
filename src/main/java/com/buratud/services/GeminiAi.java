@@ -1,13 +1,13 @@
 package com.buratud.services;
 
 import com.buratud.Utility;
-import com.buratud.data.ai.FinishReason;
-import com.buratud.data.ai.PromptResponse;
-import com.buratud.data.openai.ChatGptChannelInfo;
-import com.buratud.data.openai.chat.ChatMessage;
-import com.buratud.data.googleai.ChatCompletionRequest;
-import com.buratud.data.googleai.ChatCompletionRequestBuilder;
-import com.buratud.data.googleai.ChatCompletionStreamResponse;
+import com.buratud.entity.ai.FinishReason;
+import com.buratud.entity.ai.PromptResponse;
+import com.buratud.entity.openai.ChatGptChannelInfo;
+import com.buratud.entity.openai.chat.ChatMessage;
+import com.buratud.entity.googleai.ChatCompletionRequest;
+import com.buratud.entity.googleai.ChatCompletionRequestBuilder;
+import com.buratud.entity.googleai.ChatCompletionStreamResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;

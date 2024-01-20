@@ -1,15 +1,13 @@
 package com.buratud.interactions;
 
 import com.buratud.Service;
-import com.buratud.data.attendance.AttendanceEvent;
-import com.buratud.data.attendance.AttendanceEventInfo;
+import com.buratud.entity.attendance.AttendanceEvent;
+import com.buratud.entity.attendance.AttendanceEventInfo;
 import com.buratud.services.AttendanceService;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
-import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -20,8 +18,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class Attendance implements Handler {
@@ -126,7 +122,7 @@ public class Attendance implements Handler {
             event.reply("You haven't joined a voice channel nor provided option.").complete();
             return;
         }
-        com.buratud.data.attendance.Attendance attendance = service.GetCurrentAttendance(Objects.requireNonNull(guild).getId(), channel.getId());
+        com.buratud.entity.attendance.Attendance attendance = service.GetCurrentAttendance(Objects.requireNonNull(guild).getId(), channel.getId());
         if (attendance == null) {
             event.reply("No current attendance session.").complete();
             return;

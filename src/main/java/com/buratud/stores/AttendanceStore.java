@@ -1,7 +1,7 @@
 package com.buratud.stores;
 
-import com.buratud.data.attendance.Attendance;
-import com.buratud.data.attendance.ChannelMetadata;
+import com.buratud.entity.attendance.Attendance;
+import com.buratud.entity.attendance.ChannelMetadata;
 
 import java.util.List;
 

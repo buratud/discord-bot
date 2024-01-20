@@ -1,10 +1,9 @@
 package com.buratud.services;
 
-import com.buratud.data.openai.chat.ChatCompletionRequest;
-import com.buratud.data.openai.chat.ChatCompletionResponse;
-import com.buratud.data.openai.moderation.ModerationRequest;
-import com.buratud.data.openai.moderation.ModerationResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.buratud.entity.openai.chat.ChatCompletionRequest;
+import com.buratud.entity.openai.chat.ChatCompletionResponse;
+import com.buratud.entity.openai.moderation.ModerationRequest;
+import com.buratud.entity.openai.moderation.ModerationResponse;
 
 import java.io.IOException;
 import java.net.URI;
@@ -15,7 +14,6 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Flow;
 
