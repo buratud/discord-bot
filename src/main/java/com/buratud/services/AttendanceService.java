@@ -180,12 +180,14 @@ public class AttendanceService {
         table.getCellByPosition(1, 4).setStringValue(attendance.getId());
         table.getCellByPosition(0, 5).setStringValue("Start Date");
         table.getCellByPosition(1, 5).setStringValue(ZonedDateTime.ofInstant(attendance.getStartTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        table.getCellByPosition(0, 5).setStringValue("Start Time");
-        table.getCellByPosition(1, 5).setStringValue(ZonedDateTime.ofInstant(attendance.getStartTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+        table.getCellByPosition(2, 5).setStringValue("Start Time");
+        table.getCellByPosition(3, 5).setStringValue(ZonedDateTime.ofInstant(attendance.getStartTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("HH:mm:ss")));
         table.getCellByPosition(0, 6).setStringValue("End Date");
-        table.getCellByPosition(1, 6).setStringValue(ZonedDateTime.ofInstant(attendance.getEndTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        table.getCellByPosition(0, 6).setStringValue("End Time");
-        table.getCellByPosition(1, 6).setStringValue(ZonedDateTime.ofInstant(attendance.getEndTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+        table.getCellByPosition(2, 6).setStringValue("End Time");
+        if (attendance.getEndTime() != null) {
+            table.getCellByPosition(1, 6).setStringValue(ZonedDateTime.ofInstant(attendance.getEndTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            table.getCellByPosition(3, 6).setStringValue(ZonedDateTime.ofInstant(attendance.getEndTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+        }
         table.getCellByPosition(0, 7).setStringValue("Date");
         table.getCellByPosition(1, 7).setStringValue("Time");
         table.getCellByPosition(2, 7).setStringValue("User ID");
