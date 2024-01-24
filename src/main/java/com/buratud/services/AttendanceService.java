@@ -191,7 +191,7 @@ public class AttendanceService {
         table.getCellByPosition(1, 7).setStringValue("Time");
         table.getCellByPosition(2, 7).setStringValue("User ID");
         table.getCellByPosition(3, 7).setStringValue("Username");
-        table.getCellByPosition(3, 7).setStringValue("Nickname");
+        table.getCellByPosition(4, 7).setStringValue("Nickname");
         table.getCellByPosition(5, 7).setStringValue("Event");
         for (int i = 0; i < attendance.getLog().size(); i++) {
             int row = i + 8;
