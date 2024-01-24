@@ -145,7 +145,7 @@ public class Attendance implements Handler {
         }
     }
 
-    private void now(SlashCommandInteractionEvent event) {
+    private void now(SlashCommandInteractionEvent event) throws Exception {
         Guild guild = event.getGuild();
         Channel channel = Objects.requireNonNull(Objects.requireNonNull(event.getMember()).getVoiceState()).getChannel();
         OptionMapping option = event.getOption("channel");
@@ -163,9 +163,17 @@ public class Attendance implements Handler {
         event.deferReply().complete();
         VoiceChannel voiceChannel = (VoiceChannel) channel;
         voiceChannel.getMembers();
-        Path path = service.GenerateCurrentAttendance(voiceChannel);
+        Path path = service.GenerateCurrentAttendance(voiceChannel), sessionFilepath = null;
+        if (service.GetCurrentAttendance(guild.getId(), channel.getId()) != null) {
+            com.buratud.entity.attendance.Attendance attendance = service.GetCurrentAttendance(guild.getId(), channel.getId());
+            sessionFilepath = service.GenerateAttendanceHistory(event.getJDA(), attendance);
+        }
         if (path != null) {
-            event.getHook().sendFiles(FileUpload.fromData(path.toFile())).complete();
+            if (sessionFilepath != null) {
+                event.getHook().sendFiles(FileUpload.fromData(sessionFilepath.toFile()), FileUpload.fromData(path.toFile())).complete();
+            } else {
+                event.getHook().sendFiles(FileUpload.fromData(path.toFile())).complete();
+            }
         } else {
             event.reply("Couldn't generate file.").complete();
         }
