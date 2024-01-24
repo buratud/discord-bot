@@ -212,7 +212,7 @@ public class AttendanceService {
             }
             table.getCellByPosition(5, row).setStringValue(info.getEvent() == AttendanceEvent.IN ? "Joined" : "Left");
         }
-        Path path = Path.of(System.getProperty("java.io.tmpdir"), String.format("%s_%s.ods", channel.getName(), (ZonedDateTime.ofInstant(attendance.getEndTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")))));
+        Path path = Path.of(System.getProperty("java.io.tmpdir"), String.format("%s_%s.ods", channel.getName(), (ZonedDateTime.ofInstant(attendance.getStartTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")))));
         document.save(path.toFile());
         return path;
     }
