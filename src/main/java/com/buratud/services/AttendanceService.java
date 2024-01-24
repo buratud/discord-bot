@@ -182,7 +182,7 @@ public class AttendanceService {
         table.getCellByPosition(1, 5).setStringValue(ZonedDateTime.ofInstant(attendance.getStartTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         table.getCellByPosition(0, 5).setStringValue("Start Time");
         table.getCellByPosition(1, 5).setStringValue(ZonedDateTime.ofInstant(attendance.getStartTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("HH:mm:ss")));
-        table.getCellByPosition(0, 6).setStringValue("End Time");
+        table.getCellByPosition(0, 6).setStringValue("End Date");
         table.getCellByPosition(1, 6).setStringValue(ZonedDateTime.ofInstant(attendance.getEndTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         table.getCellByPosition(0, 6).setStringValue("End Time");
         table.getCellByPosition(1, 6).setStringValue(ZonedDateTime.ofInstant(attendance.getEndTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("HH:mm:ss")));
