@@ -7,6 +7,7 @@ import com.buratud.entity.attendance.ChannelMetadata;
 import com.buratud.stores.dynamodb.AttendanceStore;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import org.apache.logging.log4j.LogManager;
@@ -19,6 +20,7 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -57,33 +59,64 @@ public class AttendanceService {
 
     public Path GenerateCurrentAttendance(VoiceChannel channel) {
         Guild guild = channel.getGuild();
-        List<Member> members = channel.getMembers();
+        List<Member> members = guild.getMembers();
+        ZonedDateTime currentDatetime = ZonedDateTime.now(ZoneId.of("Asia/Bangkok"));
+        String currentDate = currentDatetime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        String currentTime = currentDatetime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         try (OdfSpreadsheetDocument document = OdfSpreadsheetDocument.newSpreadsheetDocument()) {
-            OdfTable table = document.getSpreadsheetTables().get(0);
-            table.setTableName("Attendance");
-            table.getCellByPosition(0, 0).setStringValue("Guild ID");
-            table.getCellByPosition(1, 0).setStringValue(guild.getId());
-            table.getCellByPosition(0, 1).setStringValue("Guild Name");
-            table.getCellByPosition(1, 1).setStringValue(guild.getName());
-            table.getCellByPosition(0, 2).setStringValue("Channel ID");
-            table.getCellByPosition(1, 2).setStringValue(channel.getId());
-            table.getCellByPosition(0, 3).setStringValue("Channel Name");
-            table.getCellByPosition(1, 3).setStringValue(channel.getName());
-            table.getCellByPosition(0, 4).setStringValue("Timestamp");
-            table.getCellByPosition(1, 4).setStringValue(ZonedDateTime.now(ZoneId.of("Asia/Bangkok")).toString());
-            table.getCellByPosition(0, 5).setStringValue("User ID");
-            table.getCellByPosition(1, 5).setStringValue("Username");
-            table.getCellByPosition(2, 5).setStringValue("Nickname");
-            for (int i = 0; i < members.size(); i++) {
-                int row = i + 6;
-                Member member = members.get(i);
-                table.getCellByPosition(0, row).setStringValue(member.getId());
-                table.getCellByPosition(1, row).setStringValue(member.getEffectiveName());
-                table.getCellByPosition(2, row).setStringValue(member.getNickname());
+            OdfTable.newTable(document);
+            OdfTable attTable = document.getSpreadsheetTables().get(0);
+            attTable.setTableName("Attendance");
+            attTable.getCellByPosition(0, 0).setStringValue("Guild ID");
+            attTable.getCellByPosition(1, 0).setStringValue(guild.getId());
+            attTable.getCellByPosition(0, 1).setStringValue("Guild Name");
+            attTable.getCellByPosition(1, 1).setStringValue(guild.getName());
+            attTable.getCellByPosition(0, 2).setStringValue("Channel ID");
+            attTable.getCellByPosition(1, 2).setStringValue(channel.getId());
+            attTable.getCellByPosition(0, 3).setStringValue("Channel Name");
+            attTable.getCellByPosition(1, 3).setStringValue(channel.getName());
+            attTable.getCellByPosition(0, 4).setStringValue("Date");
+            attTable.getCellByPosition(1, 4).setStringValue(currentDate);
+            attTable.getCellByPosition(2, 4).setStringValue("Time");
+            attTable.getCellByPosition(3, 4).setStringValue(currentTime);
+            attTable.getCellByPosition(0, 5).setStringValue("User ID");
+            attTable.getCellByPosition(1, 5).setStringValue("Username");
+            attTable.getCellByPosition(2, 5).setStringValue("Nickname");
+            OdfTable absTable = document.getSpreadsheetTables().get(1);
+            absTable.setTableName("Absence");
+            absTable.getCellByPosition(0, 0).setStringValue("Guild ID");
+            absTable.getCellByPosition(1, 0).setStringValue(guild.getId());
+            absTable.getCellByPosition(0, 1).setStringValue("Guild Name");
+            absTable.getCellByPosition(1, 1).setStringValue(guild.getName());
+            absTable.getCellByPosition(0, 2).setStringValue("Channel ID");
+            absTable.getCellByPosition(1, 2).setStringValue(channel.getId());
+            absTable.getCellByPosition(0, 3).setStringValue("Channel Name");
+            absTable.getCellByPosition(1, 3).setStringValue(channel.getName());
+            absTable.getCellByPosition(0, 4).setStringValue("Date");
+            absTable.getCellByPosition(1, 4).setStringValue(currentDate);
+            absTable.getCellByPosition(2, 4).setStringValue("Time");
+            absTable.getCellByPosition(3, 4).setStringValue(currentTime);
+            absTable.getCellByPosition(0, 5).setStringValue("User ID");
+            absTable.getCellByPosition(1, 5).setStringValue("Username");
+            absTable.getCellByPosition(2, 5).setStringValue("Nickname");
+            int attIndex = 6, absRow = 6;
+            for (Member member : members) {
+                GuildVoiceState state = member.getVoiceState();
+                if (state == null || !Objects.equals(state.getChannel(), channel)) {
+                    absTable.getCellByPosition(0, absRow).setStringValue(member.getId());
+                    absTable.getCellByPosition(1, absRow).setStringValue(member.getEffectiveName());
+                    absTable.getCellByPosition(2, absRow).setStringValue(member.getNickname());
+                    absRow++;
+                } else {
+                    attTable.getCellByPosition(0, attIndex).setStringValue(member.getId());
+                    attTable.getCellByPosition(1, attIndex).setStringValue(member.getEffectiveName());
+                    attTable.getCellByPosition(2, attIndex).setStringValue(member.getNickname());
+                    attIndex++;
+                }
             }
-            File file = File.createTempFile(String.format("%s_", guild.getId()), ".ods");
-            document.save(file);
-            return file.toPath();
+            Path path = Path.of(System.getProperty("java.io.tmpdir"), String.format("%s_%s.ods", channel.getName(), currentDatetime.format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))));
+            document.save(path.toFile());
+            return path;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
