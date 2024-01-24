@@ -119,6 +119,7 @@ public class AttendanceService {
             }
             Path path = Path.of(System.getProperty("java.io.tmpdir"), String.format("%s_%s.ods", channel.getName(), currentDatetime.format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))));
             document.save(path.toFile());
+            document.close();
             return path;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -165,46 +166,51 @@ public class AttendanceService {
         Guild guild = Objects.requireNonNull(jda.getGuildById(attendance.getGuildId()));
         VoiceChannel channel = Objects.requireNonNull(guild.getChannelById(VoiceChannel.class, attendance.getChannelId()));
         OdfSpreadsheetDocument document = OdfSpreadsheetDocument.newSpreadsheetDocument();
-            OdfTable table = document.getSpreadsheetTables().get(0);
-            table.setTableName("Attendance");
-            table.getCellByPosition(0, 0).setStringValue("Guild ID");
-            table.getCellByPosition(1, 0).setStringValue(guild.getId());
-            table.getCellByPosition(0, 1).setStringValue("Guild Name");
-            table.getCellByPosition(1, 1).setStringValue(guild.getName());
-            table.getCellByPosition(0, 2).setStringValue("Channel ID");
-            table.getCellByPosition(1, 2).setStringValue(channel.getId());
-            table.getCellByPosition(0, 3).setStringValue("Channel Name");
-            table.getCellByPosition(1, 3).setStringValue(channel.getName());
-            table.getCellByPosition(0, 4).setStringValue("Session ID");
-            table.getCellByPosition(1, 4).setStringValue(attendance.getId());
-            table.getCellByPosition(0, 5).setStringValue("Start Time");
-            table.getCellByPosition(1, 5).setStringValue(ZonedDateTime.ofInstant(attendance.getStartTime(), ZoneId.of("Asia/Bangkok")).toString());
-            table.getCellByPosition(0, 6).setStringValue("End Time");
-            table.getCellByPosition(1, 6).setStringValue(ZonedDateTime.ofInstant(attendance.getEndTime(), ZoneId.of("Asia/Bangkok")).toString());
-            table.getCellByPosition(0, 7).setStringValue("Timestamp");
-            table.getCellByPosition(1, 7).setStringValue("User ID");
-            table.getCellByPosition(2, 7).setStringValue("Username");
-            table.getCellByPosition(3, 7).setStringValue("Nickname");
-            table.getCellByPosition(4, 7).setStringValue("Event");
-            for (int i = 0; i < attendance.getLog().size(); i++) {
-                int row = i + 8;
-                AttendanceEventInfo info = attendance.getLog().get(i);
-                Member member = guild.getMemberById(info.getUserId());
-                if (member == null) {
-                    guild.loadMembers().get();
-                }
-                member = Objects.requireNonNull(guild.getMemberById(info.getUserId()));
-                table.getCellByPosition(0, row).setStringValue(ZonedDateTime.ofInstant(info.getDateTime(), ZoneId.of("Asia/Bangkok")).toString());
-                table.getCellByPosition(1, row).setStringValue(member.getId());
-                table.getCellByPosition(1, row).setStringValue(member.getId());
-                table.getCellByPosition(2, row).setStringValue(member.getEffectiveName());
-                table.getCellByPosition(3, row).setStringValue(member.getNickname());
-                table.getCellByPosition(4, row).setStringValue(info.getEvent() == AttendanceEvent.IN ? "IN" : "OUT");
+        OdfTable table = document.getSpreadsheetTables().get(0);
+        table.setTableName("Attendance");
+        table.getCellByPosition(0, 0).setStringValue("Guild ID");
+        table.getCellByPosition(1, 0).setStringValue(guild.getId());
+        table.getCellByPosition(0, 1).setStringValue("Guild Name");
+        table.getCellByPosition(1, 1).setStringValue(guild.getName());
+        table.getCellByPosition(0, 2).setStringValue("Channel ID");
+        table.getCellByPosition(1, 2).setStringValue(channel.getId());
+        table.getCellByPosition(0, 3).setStringValue("Channel Name");
+        table.getCellByPosition(1, 3).setStringValue(channel.getName());
+        table.getCellByPosition(0, 4).setStringValue("Session ID");
+        table.getCellByPosition(1, 4).setStringValue(attendance.getId());
+        table.getCellByPosition(0, 5).setStringValue("Start Date");
+        table.getCellByPosition(1, 5).setStringValue(ZonedDateTime.ofInstant(attendance.getStartTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        table.getCellByPosition(0, 5).setStringValue("Start Time");
+        table.getCellByPosition(1, 5).setStringValue(ZonedDateTime.ofInstant(attendance.getStartTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+        table.getCellByPosition(0, 6).setStringValue("End Time");
+        table.getCellByPosition(1, 6).setStringValue(ZonedDateTime.ofInstant(attendance.getEndTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        table.getCellByPosition(0, 6).setStringValue("End Time");
+        table.getCellByPosition(1, 6).setStringValue(ZonedDateTime.ofInstant(attendance.getEndTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+        table.getCellByPosition(0, 7).setStringValue("Date");
+        table.getCellByPosition(1, 7).setStringValue("Time");
+        table.getCellByPosition(2, 7).setStringValue("User ID");
+        table.getCellByPosition(3, 7).setStringValue("Username");
+        table.getCellByPosition(3, 7).setStringValue("Nickname");
+        table.getCellByPosition(5, 7).setStringValue("Event");
+        for (int i = 0; i < attendance.getLog().size(); i++) {
+            int row = i + 8;
+            AttendanceEventInfo info = attendance.getLog().get(i);
+            Member member = guild.getMemberById(info.getUserId());
+            if (member == null) {
+                guild.loadMembers().get();
             }
-            File file = File.createTempFile(String.format("%s_", guild.getId()), ".ods");
-            document.save(file);
-            document.close();
-            return file.toPath();
+            member = Objects.requireNonNull(guild.getMemberById(info.getUserId()));
+            table.getCellByPosition(0, row).setStringValue(ZonedDateTime.ofInstant(info.getDateTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            table.getCellByPosition(1, row).setStringValue(ZonedDateTime.ofInstant(info.getDateTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+            table.getCellByPosition(2, row).setStringValue(member.getId());
+            table.getCellByPosition(3, row).setStringValue(member.getEffectiveName());
+            table.getCellByPosition(4, row).setStringValue(member.getNickname());
+            table.getCellByPosition(5, row).setStringValue(info.getEvent() == AttendanceEvent.IN ? "Joined" : "Left");
+        }
+        Path path = Path.of(System.getProperty("java.io.tmpdir"), String.format("%s_%s.ods", channel.getName(), (ZonedDateTime.ofInstant(attendance.getEndTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")))));
+        document.save(path.toFile());
+        document.close();
+        return path;
     }
 
     public boolean AddEvent(String guildId, String channelId, String userId, AttendanceEventInfo event) {
