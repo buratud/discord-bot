@@ -199,12 +199,16 @@ public class AttendanceService {
             if (member == null) {
                 guild.loadMembers().get();
             }
-            member = Objects.requireNonNull(guild.getMemberById(info.getUserId()));
+            member = guild.getMemberById(info.getUserId());
             table.getCellByPosition(0, row).setStringValue(ZonedDateTime.ofInstant(info.getDateTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             table.getCellByPosition(1, row).setStringValue(ZonedDateTime.ofInstant(info.getDateTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("HH:mm:ss")));
-            table.getCellByPosition(2, row).setStringValue(member.getId());
-            table.getCellByPosition(3, row).setStringValue(member.getEffectiveName());
-            table.getCellByPosition(4, row).setStringValue(member.getNickname());
+            if (member == null) {
+                table.getCellByPosition(2, row).setStringValue("Unknown");
+            } else {
+                table.getCellByPosition(2, row).setStringValue(member.getId());
+                table.getCellByPosition(3, row).setStringValue(member.getEffectiveName());
+                table.getCellByPosition(4, row).setStringValue(member.getNickname());
+            }
             table.getCellByPosition(5, row).setStringValue(info.getEvent() == AttendanceEvent.IN ? "Joined" : "Left");
         }
         Path path = Path.of(System.getProperty("java.io.tmpdir"), String.format("%s_%s.ods", channel.getName(), (ZonedDateTime.ofInstant(attendance.getEndTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")))));
