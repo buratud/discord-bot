@@ -101,6 +101,9 @@ public class AttendanceService {
             absTable.getCellByPosition(2, 5).setStringValue("Nickname");
             int attIndex = 6, absRow = 6;
             for (Member member : members) {
+                if (member.getUser().isBot()) {
+                    continue;
+                }
                 GuildVoiceState state = member.getVoiceState();
                 if (state == null || !Objects.equals(state.getChannel(), channel)) {
                     absTable.getCellByPosition(0, absRow).setStringValue(member.getId());
