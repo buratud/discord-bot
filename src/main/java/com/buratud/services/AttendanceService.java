@@ -119,7 +119,6 @@ public class AttendanceService {
             }
             Path path = Path.of(System.getProperty("java.io.tmpdir"), String.format("%s_%s.ods", channel.getName(), currentDatetime.format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))));
             document.save(path.toFile());
-            document.close();
             return path;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -215,7 +214,6 @@ public class AttendanceService {
         }
         Path path = Path.of(System.getProperty("java.io.tmpdir"), String.format("%s_%s.ods", channel.getName(), (ZonedDateTime.ofInstant(attendance.getEndTime(), ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")))));
         document.save(path.toFile());
-        document.close();
         return path;
     }
 
