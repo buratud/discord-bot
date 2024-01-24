@@ -151,13 +151,13 @@ public class Attendance implements Handler {
         OptionMapping option = event.getOption("channel");
         if (option != null) {
             if (option.getChannelType() != ChannelType.VOICE) {
-                event.reply(String.format("%s is not a voice channel", option.getAsMentionable().getAsMention())).complete();
+                event.reply(String.format("%s is not a voice channel", option.getAsMentionable().getAsMention())).setEphemeral(true).complete();
                 return;
             }
             channel = option.getAsChannel();
         }
         if (channel == null) {
-            event.reply("You haven't joined a voice channel nor provided option.").complete();
+            event.reply("You haven't joined a voice channel nor provided option.").setEphemeral(true).complete();
             return;
         }
         event.deferReply().complete();

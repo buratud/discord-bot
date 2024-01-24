@@ -118,14 +118,14 @@ public final class ChatGpt implements Handler {
         try {
             String result = ai.chatGpt.moderationCheck(systemMessage);
             if (result != null) {
-                event.reply(String.format("System message is not set due to %s", result)).complete();
+                event.reply(String.format("System message is not set due to %s", result)).setEphemeral(true).complete();
                 return;
             }
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
         ai.setSystemMessage(params[3], params[4], systemMessage);
-        event.reply("System message set and will be applied to next session.").complete();
+        event.reply("System message set and will be applied to next session.").setEphemeral(true).complete();
     }
 
     @Override
@@ -139,10 +139,10 @@ public final class ChatGpt implements Handler {
                     case "activation" -> activate(event);
                     case "system" -> systemMessage(event);
                     case "oneshot" -> oneshot(event);
-                    default -> event.reply("Subcommand doesn't exist.").complete();
+                    default -> event.reply("Subcommand doesn't exist.").setEphemeral(true).complete();
                 }
             } else {
-                event.reply("Module is unavailable").complete();
+                event.reply("Module is unavailable").setEphemeral(true).complete();
             }
         } catch (Exception e) {
             if (event.isAcknowledged()) {
@@ -172,9 +172,9 @@ public final class ChatGpt implements Handler {
         Boolean activation = event.getOption("activate").getAsBoolean();
         ai.SetActivation(channelId, userId, activation);
         if (activation) {
-            event.reply("Activated.").complete();
+            event.reply("Activated.").setEphemeral(true).complete();
         } else {
-            event.reply("Deactivated.").complete();
+            event.reply("Deactivated.").setEphemeral(true).complete();
         }
     }
 
@@ -184,9 +184,9 @@ public final class ChatGpt implements Handler {
         Boolean activation = event.getOption("activate").getAsBoolean();
         ai.SetOneShot(channelId, userId, activation);
         if (activation) {
-            event.reply("Activated. The response will not be saved from now on.").complete();
+            event.reply("Activated. The response will not be saved from now on.").setEphemeral(true).complete();
         } else {
-            event.reply("Deactivated. The response will now continue to save.").complete();
+            event.reply("Deactivated. The response will now continue to save.").setEphemeral(true).complete();
         }
     }
 
@@ -202,7 +202,7 @@ public final class ChatGpt implements Handler {
                     Also, there is **no system message** for this model.
                     This model is incapable of generating code so you might get error from time to time.""";
         }
-        event.reply(message).complete();
+        event.reply(message).setEphemeral(true).complete();
     }
 
     private void resetChatHistory(SlashCommandInteractionEvent event) {
@@ -211,9 +211,9 @@ public final class ChatGpt implements Handler {
         ai.reset(channelId, userId);
         String systemMessage = ai.getSystemMessage(channelId, userId);
         if (systemMessage == null) {
-            event.reply("Chat history reset.").complete();
+            event.reply("Chat history reset.").setEphemeral(true).complete();
         } else {
-            event.reply(String.format("Chat history reset.\nCurrent system message: %s", systemMessage)).complete();
+            event.reply(String.format("Chat history reset.\nCurrent system message: %s", systemMessage)).setEphemeral(true).complete();
         }
     }
 
