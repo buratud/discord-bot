@@ -52,7 +52,7 @@ public class Main extends ListenerAdapter {
                                 new SubcommandData("model", "Switch model.")
                                         .addOptions(new OptionData(OptionType.STRING, "model", "Set model")
                                                 .addChoice("gpt-3.5-turbo-1106", "gpt-3.5-turbo-1106")
-                                                .addChoice("gpt-4-1106-preview", "gpt-4-1106-preview")
+                                                .addChoice("gpt-4-turbo-preview", "gpt-4-turbo-preview")
                                                 .addChoice("gemini-pro", "gemini-pro")
                                                 .setRequired(true)
                                         ),
