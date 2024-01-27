@@ -55,7 +55,7 @@ public class GenerativeAi {
             metadata.setModel(DEFAULT_MODEL);
         }
         metadata.setCurrentSession(null);
-        if (Objects.equals(metadata.getModel(), "gpt-4-1106-preview")) {
+        if (metadata.getModel().startsWith("gpt-4")) {
             metadata.setModel("gpt-3.5-turbo-1106");
         }
         store.createMetadata(metadata);
