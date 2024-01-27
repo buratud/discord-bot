@@ -4,6 +4,7 @@ import com.buratud.Utility;
 import com.buratud.entity.ai.FinishReason;
 import com.buratud.entity.ai.PromptResponse;
 import com.buratud.entity.openai.AiChatMetadata;
+import com.buratud.entity.openai.AiChatSession;
 import com.buratud.entity.openai.chat.*;
 import com.buratud.entity.openai.moderation.ModerationResponse;
 import lombok.SneakyThrows;
@@ -36,13 +37,14 @@ public class ChatGpt {
         return null;
     }
 
-    public PromptResponse sendStreamEnabled(AiChatMetadata info, List<ChatMessage> messages) throws InterruptedException, ExecutionException, IOException {
-        String message = messages.get(messages.size()-1).content;
+    public PromptResponse sendStreamEnabled(AiChatSession session) throws InterruptedException, ExecutionException, IOException {
+        List<ChatMessage> messages = session.getHistory();
+        String message = messages.get(messages.size()-1).getContent();
         String flagged = moderationCheck(message);
         if (flagged != null) {
             return new PromptResponse(true, String.format("Message was blocked due to %s", flagged), FinishReason.VIOLATION);
         }
-        ChatCompletionRequest request = new ChatCompletionRequestBuilder(info.getModel(), messages).withStream(true).build();
+        ChatCompletionRequest request = new ChatCompletionRequestBuilder(session.getModel(), messages).withStream(true).build();
         EventStreamSubscriber subscriber = new EventStreamSubscriber();
         client.sendChatCompletionRequestWithStreamEnabled(request, subscriber);
         String messageRes = subscriber.getContent();

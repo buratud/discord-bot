@@ -17,7 +17,7 @@ public interface ChatCompletionRequestMapper {
 
     default Content map(ChatMessage value) {
         Content content = new Content();
-        Role sourceRole = value.role;
+        Role sourceRole = value.getRole();
         com.buratud.entity.googleai.Role targetRole;
         if (sourceRole == Role.SYSTEM) {
             targetRole = com.buratud.entity.googleai.Role.SYSTEM;
@@ -28,7 +28,7 @@ public interface ChatCompletionRequestMapper {
         }
         content.setRole(targetRole);
         Part part = new Part();
-        part.setText(value.content);
+        part.setText(value.getContent());
         content.setParts(List.of(part));
         return content;
     }

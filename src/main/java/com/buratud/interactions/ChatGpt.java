@@ -66,9 +66,10 @@ public final class ChatGpt implements Handler {
                 }
                 Message message = event.getMessage();
                 String rawMessage = message.getContentRaw();
+                String guildId = event.getGuild().getId();
                 String channelId = event.getChannel().getId();
                 String userId = event.getAuthor().getId();
-                AiChatMetadata info = ai.getInfo(channelId, userId);
+                AiChatMetadata info = ai.getInfo(guildId, channelId, userId);
                 if (!message.getMentions().mentionsEveryone() &&
                         (message.getMentions().isMentioned(event.getJDA().getSelfUser()) || info != null && info.isActivated())) {
                     typingManager.increase(event.getGuildChannel());
@@ -78,7 +79,7 @@ public final class ChatGpt implements Handler {
                         rawMessage = rawMessage.substring(lastPos + 1).trim();
                     }
                     rawMessage = replaceFileContent(rawMessage, message.getAttachments());
-                    PromptResponse res = ai.sendStreamEnabled(channelId, userId, rawMessage);
+                    PromptResponse res = ai.sendStreamEnabled(guildId, channelId, userId, rawMessage);
                     String responseMessage = res.getMessage();
                     if (res.getFinishReason() != FinishReason.NORMAL && res.getFinishReason() != FinishReason.VIOLATION) {
                         responseMessage += "\n\nMessage was cut due to " + res.getFinishReason().toString();
@@ -124,7 +125,7 @@ public final class ChatGpt implements Handler {
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
-        ai.setSystemMessage(params[3], params[4], systemMessage);
+        ai.setSystemMessage(params[2], params[3], params[4], systemMessage);
         event.reply("System message set and will be applied to next session.").setEphemeral(true).complete();
     }
 
@@ -159,7 +160,7 @@ public final class ChatGpt implements Handler {
 
     private void systemMessage(SlashCommandInteractionEvent event) {
         final String id = String.format("chatgpt_system_%s_%s_%s", event.getGuild().getId(), event.getChannel().getId(), event.getMember().getId());
-        String currentSystemMessage = ai.getSystemMessage(event.getChannel().getId(), event.getMember().getId());
+        String currentSystemMessage = ai.getSystemMessage(event.getGuild().getId(), event.getChannel().getId(), event.getMember().getId());
         TextInput systemMessageInput = TextInput.create("system_message", "System Message", TextInputStyle.PARAGRAPH)
                 .setValue(currentSystemMessage).setRequired(false).build();
         Modal modal = Modal.create(id, "System Message").addActionRow(systemMessageInput).build();
@@ -167,10 +168,11 @@ public final class ChatGpt implements Handler {
     }
 
     private void activate(SlashCommandInteractionEvent event) {
+        String guildId = event.getGuild().getId();
         String channelId = event.getMessageChannel().getId();
         String userId = event.getMember().getId();
         Boolean activation = event.getOption("activate").getAsBoolean();
-        ai.SetActivation(channelId, userId, activation);
+        ai.SetActivation(guildId, channelId, userId, activation);
         if (activation) {
             event.reply("Activated.").setEphemeral(true).complete();
         } else {
@@ -179,10 +181,11 @@ public final class ChatGpt implements Handler {
     }
 
     private void oneshot(SlashCommandInteractionEvent event) {
+        String guildId = event.getGuild().getId();
         String channelId = event.getMessageChannel().getId();
         String userId = event.getMember().getId();
         Boolean activation = event.getOption("activate").getAsBoolean();
-        ai.SetOneShot(channelId, userId, activation);
+        ai.SetOneShot(guildId, channelId, userId, activation);
         if (activation) {
             event.reply("Activated. The response will not be saved from now on.").setEphemeral(true).complete();
         } else {
@@ -191,10 +194,11 @@ public final class ChatGpt implements Handler {
     }
 
     private void switchModel(SlashCommandInteractionEvent event) {
+        String guildId = event.getGuild().getId();
         String channelId = event.getMessageChannel().getId();
         String userId = event.getMember().getId();
         String model = event.getOption("model").getAsString();
-        ai.SwitchModel(channelId, userId, model);
+        ai.SwitchModel(guildId, channelId, userId, model);
         String message = String.format("Switched to %s model.", model);
         if (model.startsWith("gemini")) {
             message += """
@@ -206,10 +210,11 @@ public final class ChatGpt implements Handler {
     }
 
     private void resetChatHistory(SlashCommandInteractionEvent event) {
+        String guildId = event.getGuild().getId();
         String channelId = event.getMessageChannel().getId();
         String userId = event.getMember().getId();
-        ai.reset(channelId, userId);
-        String systemMessage = ai.getSystemMessage(channelId, userId);
+        ai.reset(guildId, channelId, userId);
+        String systemMessage = ai.getSystemMessage(guildId, channelId, userId);
         if (systemMessage == null) {
             event.reply("Chat history reset.").setEphemeral(true).complete();
         } else {

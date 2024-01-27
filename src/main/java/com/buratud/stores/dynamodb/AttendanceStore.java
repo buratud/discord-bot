@@ -28,8 +28,8 @@ import java.util.stream.Collectors;
 
 public class AttendanceStore implements com.buratud.stores.AttendanceStore {
     static final Logger logger = LogManager.getLogger(Attendance.class);
-    static final DynamoDbClient db = DynamoDbClient.builder().region(Region.of(Env.AWS_REGION)).credentialsProvider(() -> AwsBasicCredentials.create(Env.AWS_ACCESS_KEY, Env.AWS_SECRET_ACCESS_KEY)).build();
-    static final DynamoDbEnhancedClient edb = DynamoDbEnhancedClient.builder().dynamoDbClient(db).build();
+    static final DynamoDbClient db = Client.getInstance().getDb();
+    static final DynamoDbEnhancedClient edb = Client.getInstance().getEdb();
     static final DynamoDbTable<Attendance> attendanceTable =
             edb.table("discord-bot", TableSchema.fromBean(Attendance.class));
     static final DynamoDbTable<ChannelMetadata> attendanceMetadataTable =

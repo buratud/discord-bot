@@ -11,9 +11,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 public class GenerativeAi {
@@ -24,8 +24,9 @@ public class GenerativeAi {
 
     public final ChatGpt chatGpt;
     private final GeminiAi gemini;
+
     public GenerativeAi() throws IOException {
-        store = new com.buratud.stores.ephemeral.ChatGpt();
+        store = new com.buratud.stores.dynamodb.AiStore();
         readSystemMessage();
         chatGpt = new ChatGpt(Env.OPENAI_API_KEY);
         gemini = new GeminiAi(Env.GEMINI_API_KEY);
@@ -43,100 +44,108 @@ public class GenerativeAi {
         }
     }
 
-    public AiChatMetadata getInfo(String channelId, String userId) {
-        return store.getChannelInfo(null, channelId, userId);
+    public AiChatMetadata getInfo(String guildId, String channelId, String userId) {
+        return store.getMetadata(guildId, channelId, userId);
     }
 
-    public AiChatMetadata reset(String channelId, String userId) {
-        AiChatMetadata info = store.getChannelInfo(null, channelId, userId);
-        if (info == null) {
-            info = new AiChatMetadata(null, channelId, userId);
-            info.setModel(DEFAULT_MODEL);
-            if (system != null) {
-                info.getHistory().add(system);
-            }
-            return store.createChannelInfo(info);
-        }
-        if (Objects.equals(info.getModel(), "gpt-4-1106-preview")){
-            info.setModel("gpt-3.5-turbo-1106");
-        }
-        info.setHistory(new ArrayList<>());
-        String userSystemMessage = getSystemMessage(channelId, userId);
-        if (userSystemMessage != null) {
-            info.getHistory().add(new ChatMessage(Role.SYSTEM, userSystemMessage));
-        }
-        return store.putChannelInfo(info);
-    }
-
-    public void SwitchModel(String channelId, String userId, String model) {
-        AiChatMetadata info = store.getChannelInfo(null, channelId, userId);
-        if (info == null) {
-            info = reset(channelId, userId);
-        }
-        info.setModel(model);
-        store.putChannelInfo(info);
-    }
-
-    public void SetActivation(String channelId, String userId, Boolean activation) {
-        AiChatMetadata info = store.getChannelInfo(null, channelId, userId);
-        if (info == null) {
-            info = reset(channelId, userId);
-        }
-        info.setActivated(activation);
-        store.putChannelInfo(info);
-    }
-
-    public void SetOneShot(String channelId, String userId, Boolean activation) {
-        AiChatSession metadata = store.getChannelMemberMetadata(null, channelId, userId);
+    public AiChatMetadata reset(String guildId, String channelId, String userId) {
+        AiChatMetadata metadata = store.getMetadata(guildId, channelId, userId);
         if (metadata == null) {
-            metadata = new AiChatSession(null, channelId, userId);
+            metadata = new AiChatMetadata(guildId, channelId, userId);
+            metadata.setModel(DEFAULT_MODEL);
+        }
+        metadata.setCurrentSession(null);
+        if (Objects.equals(metadata.getModel(), "gpt-4-1106-preview")) {
+            metadata.setModel("gpt-3.5-turbo-1106");
+        }
+        store.createMetadata(metadata);
+        return metadata;
+    }
+
+    public void SwitchModel(String guildId, String channelId, String userId, String model) {
+        AiChatMetadata metadata = store.getMetadata(guildId, channelId, userId);
+        if (metadata == null) {
+            metadata = reset(guildId, channelId, userId);
+        }
+        metadata.setModel(model);
+        if (metadata.getCurrentSession() != null) {
+            AiChatSession session = store.getSession(guildId, channelId, userId, metadata.getCurrentSession().toString());
+            session.setModel(model);
+            store.updateSession(session);
+        }
+        store.updateMetadata(metadata);
+    }
+
+    public void SetActivation(String guildId, String channelId, String userId, Boolean activation) {
+        AiChatMetadata metadata = store.getMetadata(null, channelId, userId);
+        if (metadata == null) {
+            metadata = reset(guildId, channelId, userId);
+        }
+        metadata.setActivated(activation);
+        store.updateMetadata(metadata);
+    }
+
+    public void SetOneShot(String guildId, String channelId, String userId, Boolean activation) {
+        AiChatMetadata metadata = store.getMetadata(guildId, channelId, userId);
+        if (metadata == null) {
+            metadata = reset(guildId, channelId, userId);
         }
         metadata.setOneShot(activation);
-        store.createChannelMemberMetadata(metadata);
+        store.updateMetadata(metadata);
     }
 
-    public String getSystemMessage(String channelId, String userId) {
-        AiChatSession metadata = store.getChannelMemberMetadata(null, channelId, userId);
+    public String getSystemMessage(String guildId, String channelId, String userId) {
+        AiChatMetadata metadata = store.getMetadata(guildId, channelId, userId);
         if (metadata != null) {
             return metadata.getSystemMessage();
         }
         return null;
     }
 
-    public void setSystemMessage(String channelId, String userId, String message) {
-        AiChatSession metadata = store.getChannelMemberMetadata(null, channelId, userId);
+    public void setSystemMessage(String guildId, String channelId, String userId, String message) {
+        AiChatMetadata metadata = store.getMetadata(guildId, channelId, userId);
         if (metadata == null) {
-            metadata = new AiChatSession(null, channelId, userId);
+            metadata = reset(guildId, channelId, userId);
         }
-        if (Objects.equals(message, "")) {
-            metadata.setSystemMessage(null);
-        } else {
-            metadata.setSystemMessage(message);
-        }
-        store.createChannelMemberMetadata(metadata);
+        metadata.setSystemMessage(message.isEmpty() ? null : message);
+        store.updateMetadata(metadata);
     }
 
-    public PromptResponse sendStreamEnabled(String channelId, String userId, String message) throws IOException, ExecutionException, InterruptedException {
-        AiChatMetadata info = store.getChannelInfo(null, channelId, userId);
-        if (info == null) {
-            info = reset(channelId, userId);
+    public PromptResponse sendStreamEnabled(String guildId, String channelId, String userId, String message) throws IOException, ExecutionException, InterruptedException {
+        AiChatMetadata metadata = store.getMetadata(guildId, channelId, userId);
+        AiChatSession session;
+        if (metadata == null) {
+            metadata = reset(guildId, channelId, userId);
         }
-        List<ChatMessage> messages = new ArrayList<>(List.copyOf(info.getHistory()).stream().toList());
+        if (metadata.getCurrentSession() == null) {
+            UUID id = UUID.randomUUID();
+            metadata.setCurrentSession(id);
+            session = new AiChatSession(guildId, channelId, userId, id);
+            session.setModel(metadata.getModel());
+            if (metadata.getSystemMessage() != null) {
+                session.setSystemMessage(metadata.getSystemMessage());
+                session.getHistory().add(new ChatMessage(Role.SYSTEM, metadata.getSystemMessage()));
+            }
+            if (!metadata.getOneShot()) {
+                store.updateMetadata(metadata);
+            }
+        } else {
+            session = store.getSession(guildId, channelId, userId, metadata.getCurrentSession().toString());
+        }
+        List<ChatMessage> messages = session.getHistory();
         messages.add(new ChatMessage(Role.USER, message));
         PromptResponse response;
-        if (info.getModel().startsWith("gpt")) {
-            response = chatGpt.sendStreamEnabled(info, messages);
+        if (session.getModel().startsWith("gpt")) {
+            response = chatGpt.sendStreamEnabled(session);
         } else {
-            response = gemini.sendStreamEnabled(info, messages);
+            response = gemini.sendStreamEnabled(session);
         }
         if (response.isFlagged()) {
             return response;
         }
         messages.add(new ChatMessage(Role.ASSISTANT, response.getMessage()));
-        AiChatSession metadata = store.getChannelMemberMetadata(null, channelId, userId);
-        if (metadata == null || !metadata.isOneShot()) {
-            info.setHistory(messages);
-            store.putChannelInfo(info);
+        if (!metadata.getOneShot()) {
+            store.createSession(session);
         }
         return response;
     }
