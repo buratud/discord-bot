@@ -99,8 +99,7 @@ public final class ChatGpt implements Handler {
                 for (StackTraceElement element : e.getStackTrace()) {
                     logger.error(element.toString());
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 event.getMessage().reply("Something went wrong, try again later.").complete();
                 logger.error(e);
                 for (StackTraceElement element : e.getStackTrace()) {
@@ -213,13 +212,14 @@ public final class ChatGpt implements Handler {
         String guildId = event.getGuild().getId();
         String channelId = event.getMessageChannel().getId();
         String userId = event.getMember().getId();
-        ai.reset(guildId, channelId, userId);
+        AiChatMetadata metadata = ai.reset(guildId, channelId, userId);
+        StringBuilder builder = new StringBuilder("Chat history reset.");
         String systemMessage = ai.getSystemMessage(guildId, channelId, userId);
-        if (systemMessage == null) {
-            event.reply("Chat history reset.").setEphemeral(true).complete();
-        } else {
-            event.reply(String.format("Chat history reset.\nCurrent system message: %s", systemMessage)).setEphemeral(true).complete();
+        builder.append('\n').append("Current model: ").append(metadata.getModel());
+        if (systemMessage != null) {
+            builder.append('\n').append("Current system message: ").append(systemMessage);
         }
+        event.reply(builder.toString()).setEphemeral(true).complete();
     }
 
     public static CompletableFuture<String> convertInputStreamToString(CompletableFuture<InputStream> inputStreamFuture) {
