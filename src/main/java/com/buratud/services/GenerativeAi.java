@@ -114,10 +114,12 @@ public class GenerativeAi {
     public PromptResponse sendStreamEnabled(String guildId, String channelId, String userId, String message) throws IOException, ExecutionException, InterruptedException {
         AiChatMetadata metadata = store.getMetadata(guildId, channelId, userId);
         AiChatSession session;
+        boolean isNewSession = false;
         if (metadata == null) {
             metadata = reset(guildId, channelId, userId);
         }
         if (metadata.getCurrentSession() == null) {
+            isNewSession = true;
             UUID id = UUID.randomUUID();
             metadata.setCurrentSession(id);
             session = new AiChatSession(guildId, channelId, userId, id);
@@ -125,9 +127,6 @@ public class GenerativeAi {
             if (metadata.getSystemMessage() != null) {
                 session.setSystemMessage(metadata.getSystemMessage());
                 session.getHistory().add(new ChatMessage(Role.SYSTEM, metadata.getSystemMessage()));
-            }
-            if (!metadata.getOneShot()) {
-                store.updateMetadata(metadata);
             }
         } else {
             session = store.getSession(guildId, channelId, userId, metadata.getCurrentSession().toString());
@@ -145,6 +144,9 @@ public class GenerativeAi {
         }
         messages.add(new ChatMessage(Role.ASSISTANT, response.getMessage()));
         if (!metadata.getOneShot()) {
+            if (isNewSession) {
+                store.updateMetadata(metadata);
+            }
             store.createSession(session);
         }
         return response;
