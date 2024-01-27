@@ -1,17 +1,17 @@
 package com.buratud.stores.ephemeral;
 
-import com.buratud.entity.openai.ChatGptChannelInfo;
-import com.buratud.entity.openai.ChatGptMetadata;
+import com.buratud.entity.openai.AiChatMetadata;
+import com.buratud.entity.openai.AiChatSession;
 
 import java.util.HashMap;
 
 public class ChatGpt implements com.buratud.stores.ChatGpt {
 
-    HashMap<String, HashMap<String, ChatGptChannelInfo>> chat = new HashMap<>();
-    HashMap<String, HashMap<String, ChatGptMetadata>> metadata = new HashMap<>();
+    HashMap<String, HashMap<String, AiChatMetadata>> chat = new HashMap<>();
+    HashMap<String, HashMap<String, AiChatSession>> metadata = new HashMap<>();
 
     @Override
-    public ChatGptChannelInfo getChannelInfo(String guildId, String channelId, String userId) {
+    public AiChatMetadata getChannelInfo(String guildId, String channelId, String userId) {
         if (chat.containsKey(channelId)) {
             if (chat.get(channelId).containsKey(userId)) {
                 return chat.get(channelId).get(userId);
@@ -21,7 +21,7 @@ public class ChatGpt implements com.buratud.stores.ChatGpt {
     }
 
     @Override
-    public ChatGptChannelInfo createChannelInfo(ChatGptChannelInfo item) {
+    public AiChatMetadata createChannelInfo(AiChatMetadata item) {
         if (!chat.containsKey(item.getChannelId())) {
             chat.put(item.getChannelId(), new HashMap<>());
         }
@@ -32,25 +32,25 @@ public class ChatGpt implements com.buratud.stores.ChatGpt {
     }
 
     @Override
-    public ChatGptChannelInfo putChannelInfo(ChatGptChannelInfo item) {
+    public AiChatMetadata putChannelInfo(AiChatMetadata item) {
         chat.get(item.getChannelId()).put(item.getMemberId(), item);
         return item;
     }
 
     @Override
-    public ChatGptChannelInfo appendHistory(ChatGptChannelInfo item) {
-        ChatGptChannelInfo info = chat.get(item.getChannelId()).get(item.getMemberId());
+    public AiChatMetadata appendHistory(AiChatMetadata item) {
+        AiChatMetadata info = chat.get(item.getChannelId()).get(item.getMemberId());
         info.getHistory().add(item.getHistory().get(item.getHistory().size() - 1));
         return item;
     }
 
     @Override
-    public ChatGptChannelInfo deleteChannelInfo(String guildId, String channelId, String userId) {
-        return chat.get(channelId).put(userId, new ChatGptChannelInfo());
+    public AiChatMetadata deleteChannelInfo(String guildId, String channelId, String userId) {
+        return chat.get(channelId).put(userId, new AiChatMetadata());
     }
 
     @Override
-    public ChatGptMetadata getChannelMemberMetadata(String guildId, String channelId, String userId) {
+    public AiChatSession getChannelMemberMetadata(String guildId, String channelId, String userId) {
         if (metadata.containsKey(channelId) && metadata.get(channelId).containsKey(userId)) {
             return metadata.get(channelId).get(userId);
         }
@@ -58,7 +58,7 @@ public class ChatGpt implements com.buratud.stores.ChatGpt {
     }
 
     @Override
-    public ChatGptMetadata createChannelMemberMetadata(ChatGptMetadata item) {
+    public AiChatSession createChannelMemberMetadata(AiChatSession item) {
         if (!metadata.containsKey(item.getChannelId())) {
             metadata.put(item.getChannelId(), new HashMap<>());
         }
@@ -67,7 +67,7 @@ public class ChatGpt implements com.buratud.stores.ChatGpt {
     }
 
     @Override
-    public ChatGptMetadata putChannelMemberMetadata(ChatGptMetadata item) {
+    public AiChatSession putChannelMemberMetadata(AiChatSession item) {
         metadata.get(item.getChannelId()).put(item.getMemberId(), item);
         return getChannelMemberMetadata(item.getGuildId(), item.getChannelId(), item.getMemberId());
     }

@@ -1,23 +1,23 @@
 package com.buratud.stores;
 
-import com.buratud.entity.openai.ChatGptChannelInfo;
-import com.buratud.entity.openai.ChatGptMetadata;
+import com.buratud.entity.openai.AiChatMetadata;
+import com.buratud.entity.openai.AiChatSession;
 
 public interface ChatGpt {
-    ChatGptChannelInfo getChannelInfo(String guildId, String channelId, String userId);
+    AiChatMetadata getChannelInfo(String guildId, String channelId, String userId);
 
-    ChatGptChannelInfo createChannelInfo(ChatGptChannelInfo item);
+    AiChatMetadata createChannelInfo(AiChatMetadata item);
 
-    ChatGptChannelInfo putChannelInfo(ChatGptChannelInfo item);
-    ChatGptChannelInfo appendHistory(ChatGptChannelInfo item);
+    AiChatMetadata putChannelInfo(AiChatMetadata item);
+    AiChatMetadata appendHistory(AiChatMetadata item);
 
-    ChatGptChannelInfo deleteChannelInfo(String guildId, String channelId, String userId);
+    AiChatMetadata deleteChannelInfo(String guildId, String channelId, String userId);
 
-    ChatGptMetadata getChannelMemberMetadata(String guildId, String channelId, String userId);
+    AiChatSession getChannelMemberMetadata(String guildId, String channelId, String userId);
 
-    ChatGptMetadata createChannelMemberMetadata(ChatGptMetadata item);
+    AiChatSession createChannelMemberMetadata(AiChatSession item);
 
-    ChatGptMetadata putChannelMemberMetadata(ChatGptMetadata item);
+    AiChatSession putChannelMemberMetadata(AiChatSession item);
 
     void deleteChannelMemberMetadata(String guildId, String channelId, String userId);
 }

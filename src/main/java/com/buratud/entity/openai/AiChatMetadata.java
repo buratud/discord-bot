@@ -12,8 +12,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public final class ChatGptChannelInfo extends MemberChannelData {
-    public ChatGptChannelInfo(String guildId, String channelId, String memberId) {
+public final class AiChatMetadata extends MemberChannelData {
+    public AiChatMetadata(String guildId, String channelId, String memberId) {
         this.guildId = guildId;
         this.channelId = channelId;
         this.memberId = memberId;

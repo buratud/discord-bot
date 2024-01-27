@@ -3,7 +3,7 @@ package com.buratud.services;
 import com.buratud.Utility;
 import com.buratud.entity.ai.FinishReason;
 import com.buratud.entity.ai.PromptResponse;
-import com.buratud.entity.openai.ChatGptChannelInfo;
+import com.buratud.entity.openai.AiChatMetadata;
 import com.buratud.entity.openai.chat.ChatMessage;
 import com.buratud.entity.googleai.ChatCompletionRequest;
 import com.buratud.entity.googleai.ChatCompletionRequestBuilder;
@@ -27,7 +27,7 @@ public class GeminiAi {
         client = new GeminiHttp(key);
     }
 
-    public PromptResponse sendStreamEnabled(ChatGptChannelInfo info, List<ChatMessage> messages) throws InterruptedException, ExecutionException, IOException {
+    public PromptResponse sendStreamEnabled(AiChatMetadata info, List<ChatMessage> messages) throws InterruptedException, ExecutionException, IOException {
         ChatCompletionRequest request = new ChatCompletionRequestBuilder().withMessages(messages).build();
         EventStreamSubscriber subscriber = new EventStreamSubscriber();
         client.sendChatCompletionRequestWithStreamEnabled(request, subscriber);

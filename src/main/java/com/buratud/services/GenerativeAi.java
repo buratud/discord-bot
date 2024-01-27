@@ -2,8 +2,8 @@ package com.buratud.services;
 
 import com.buratud.Env;
 import com.buratud.entity.ai.PromptResponse;
-import com.buratud.entity.openai.ChatGptChannelInfo;
-import com.buratud.entity.openai.ChatGptMetadata;
+import com.buratud.entity.openai.AiChatMetadata;
+import com.buratud.entity.openai.AiChatSession;
 import com.buratud.entity.openai.chat.ChatMessage;
 import com.buratud.entity.openai.chat.Role;
 
@@ -43,14 +43,14 @@ public class GenerativeAi {
         }
     }
 
-    public ChatGptChannelInfo getInfo(String channelId, String userId) {
+    public AiChatMetadata getInfo(String channelId, String userId) {
         return store.getChannelInfo(null, channelId, userId);
     }
 
-    public ChatGptChannelInfo reset(String channelId, String userId) {
-        ChatGptChannelInfo info = store.getChannelInfo(null, channelId, userId);
+    public AiChatMetadata reset(String channelId, String userId) {
+        AiChatMetadata info = store.getChannelInfo(null, channelId, userId);
         if (info == null) {
-            info = new ChatGptChannelInfo(null, channelId, userId);
+            info = new AiChatMetadata(null, channelId, userId);
             info.setModel(DEFAULT_MODEL);
             if (system != null) {
                 info.getHistory().add(system);
@@ -69,7 +69,7 @@ public class GenerativeAi {
     }
 
     public void SwitchModel(String channelId, String userId, String model) {
-        ChatGptChannelInfo info = store.getChannelInfo(null, channelId, userId);
+        AiChatMetadata info = store.getChannelInfo(null, channelId, userId);
         if (info == null) {
             info = reset(channelId, userId);
         }
@@ -78,7 +78,7 @@ public class GenerativeAi {
     }
 
     public void SetActivation(String channelId, String userId, Boolean activation) {
-        ChatGptChannelInfo info = store.getChannelInfo(null, channelId, userId);
+        AiChatMetadata info = store.getChannelInfo(null, channelId, userId);
         if (info == null) {
             info = reset(channelId, userId);
         }
@@ -87,16 +87,16 @@ public class GenerativeAi {
     }
 
     public void SetOneShot(String channelId, String userId, Boolean activation) {
-        ChatGptMetadata metadata = store.getChannelMemberMetadata(null, channelId, userId);
+        AiChatSession metadata = store.getChannelMemberMetadata(null, channelId, userId);
         if (metadata == null) {
-            metadata = new ChatGptMetadata(null, channelId, userId);
+            metadata = new AiChatSession(null, channelId, userId);
         }
         metadata.setOneShot(activation);
         store.createChannelMemberMetadata(metadata);
     }
 
     public String getSystemMessage(String channelId, String userId) {
-        ChatGptMetadata metadata = store.getChannelMemberMetadata(null, channelId, userId);
+        AiChatSession metadata = store.getChannelMemberMetadata(null, channelId, userId);
         if (metadata != null) {
             return metadata.getSystemMessage();
         }
@@ -104,9 +104,9 @@ public class GenerativeAi {
     }
 
     public void setSystemMessage(String channelId, String userId, String message) {
-        ChatGptMetadata metadata = store.getChannelMemberMetadata(null, channelId, userId);
+        AiChatSession metadata = store.getChannelMemberMetadata(null, channelId, userId);
         if (metadata == null) {
-            metadata = new ChatGptMetadata(null, channelId, userId);
+            metadata = new AiChatSession(null, channelId, userId);
         }
         if (Objects.equals(message, "")) {
             metadata.setSystemMessage(null);
@@ -117,7 +117,7 @@ public class GenerativeAi {
     }
 
     public PromptResponse sendStreamEnabled(String channelId, String userId, String message) throws IOException, ExecutionException, InterruptedException {
-        ChatGptChannelInfo info = store.getChannelInfo(null, channelId, userId);
+        AiChatMetadata info = store.getChannelInfo(null, channelId, userId);
         if (info == null) {
             info = reset(channelId, userId);
         }
@@ -133,7 +133,7 @@ public class GenerativeAi {
             return response;
         }
         messages.add(new ChatMessage(Role.ASSISTANT, response.getMessage()));
-        ChatGptMetadata metadata = store.getChannelMemberMetadata(null, channelId, userId);
+        AiChatSession metadata = store.getChannelMemberMetadata(null, channelId, userId);
         if (metadata == null || !metadata.isOneShot()) {
             info.setHistory(messages);
             store.putChannelInfo(info);

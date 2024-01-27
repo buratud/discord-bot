@@ -7,8 +7,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public final class ChatGptMetadata extends MemberChannelData {
-    public ChatGptMetadata(String guildId, String channelId, String memberId) {
+public final class AiChatSession extends MemberChannelData {
+    public AiChatSession(String guildId, String channelId, String memberId) {
         this.guildId = guildId;
         this.channelId = channelId;
         this.memberId = memberId;

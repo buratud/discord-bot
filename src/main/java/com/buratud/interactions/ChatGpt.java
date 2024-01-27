@@ -3,7 +3,7 @@ package com.buratud.interactions;
 import com.buratud.Service;
 import com.buratud.entity.ai.FinishReason;
 import com.buratud.entity.ai.PromptResponse;
-import com.buratud.entity.openai.ChatGptChannelInfo;
+import com.buratud.entity.openai.AiChatMetadata;
 import com.buratud.services.GenerativeAi;
 import com.buratud.services.TypingManager;
 import net.dv8tion.jda.api.entities.Message;
@@ -68,7 +68,7 @@ public final class ChatGpt implements Handler {
                 String rawMessage = message.getContentRaw();
                 String channelId = event.getChannel().getId();
                 String userId = event.getAuthor().getId();
-                ChatGptChannelInfo info = ai.getInfo(channelId, userId);
+                AiChatMetadata info = ai.getInfo(channelId, userId);
                 if (!message.getMentions().mentionsEveryone() &&
                         (message.getMentions().isMentioned(event.getJDA().getSelfUser()) || info != null && info.isActivated())) {
                     typingManager.increase(event.getGuildChannel());
