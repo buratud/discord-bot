@@ -1,5 +1,7 @@
 package com.buratud;
 
+import java.util.Objects;
+
 public class Env {
     public static String DISCORD_TOKEN = System.getenv("DISCORD_TOKEN");
     public static String AZURE_VISION_ENDPOINT = System.getenv("AZURE_VISION_ENDPOINT");
@@ -9,5 +11,5 @@ public class Env {
     public static String AWS_REGION = System.getenv("AWS_REGION");
     public static String AWS_ACCESS_KEY = System.getenv("AWS_ACCESS_KEY");
     public static String AWS_SECRET_ACCESS_KEY = System.getenv("AWS_SECRET_ACCESS_KEY");
-
+    public static String ENVIRONMENT = Objects.equals(System.getenv("ENVIRONMENT"), "TEST") ? "TEST" : "PROD";
 }
