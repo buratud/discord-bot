@@ -6,6 +6,11 @@ import com.buratud.entity.openai.AiChatMetadata;
 import com.buratud.entity.openai.AiChatSession;
 import com.buratud.entity.openai.chat.ChatMessage;
 import com.buratud.entity.openai.chat.Role;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,11 +24,11 @@ import java.util.concurrent.ExecutionException;
 public class GenerativeAi {
     private final com.buratud.stores.ChatGpt store;
     private ChatMessage system;
-    private static final String DEFAULT_MODEL = "gpt-3.5-turbo-1106";
+    private static String DEFAULT_MODEL = "gpt-3.5-turbo-1106";
     private static final String SYSTEM_MESSAGE_FILE = "./system_message.txt";
 
     public final ChatGpt chatGpt;
-    private final GeminiAi gemini;
+    public final GeminiAi gemini;
 
     public GenerativeAi() throws IOException {
         store = new com.buratud.stores.dynamodb.AiStore();
@@ -32,6 +37,9 @@ public class GenerativeAi {
         gemini = new GeminiAi(Env.GEMINI_API_KEY);
     }
 
+    public void setDefaultModel(String model) {
+        DEFAULT_MODEL = model;
+    }
 
     private void readSystemMessage() throws IOException {
         system = null;

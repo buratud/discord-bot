@@ -10,6 +10,11 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
@@ -55,6 +60,35 @@ public final class ChatGpt implements Handler {
             instance = new ChatGpt();
         }
         return instance;
+    }
+
+    public void AddCommand(List<CommandData> dataList) {
+        OptionData option = new OptionData(OptionType.STRING, "model", "Set model")
+                .setRequired(true);
+        if (ai.chatGpt != null) {
+            option.addChoice("gpt-3.5-turbo-1106", "gpt-3.5-turbo-1106");
+            option.addChoice("gpt-4-turbo-preview", "gpt-4-turbo-preview");
+            ai.setDefaultModel("gpt-3.5-turbo-1106");
+        }
+        if (ai.gemini != null) {
+            option.addChoice("gemini-pro", "gemini-pro");
+            ai.setDefaultModel("gemini-pro");
+        }
+        CommandData data = Commands.slash("chatgpt", "ChatGPT related command.")
+                .addSubcommands(new SubcommandData("reset", "Reset chat history."),
+                        new SubcommandData("model", "Switch model.")
+                                .addOptions(option),
+                        new SubcommandData("activation", "Set activation for continuous use.")
+                                .addOptions(new OptionData(OptionType.BOOLEAN, "activate", "Set whether to continuously use.")
+                                        .setRequired(true)
+                                ),
+                        new SubcommandData("oneshot", "Set one shot to save cost.")
+                                .addOptions(new OptionData(OptionType.BOOLEAN, "activate", "Set whether to activate one-shot.")
+                                        .setRequired(true)
+                                ),
+                        new SubcommandData("system", "Set a system message for this channel.")
+                );
+        dataList.add(data);
     }
 
     @Override

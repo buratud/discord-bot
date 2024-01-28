@@ -16,12 +16,14 @@ public class Service {
     public AttendanceService attendance;
 
     private Service() throws IOException {
-        if (Env.OPENAI_API_KEY != null) {
-            logger.info("ChatGPT activated");
+        if (Env.OPENAI_API_KEY != null || Env.GEMINI_API_KEY != null) {
             generativeAi = new GenerativeAi();
+            logger.info("AI activated");
         }
-        logger.info("Computer vision activated");
-        vision = new ComputerVision(Env.AZURE_VISION_ENDPOINT, Env.AZURE_VISION_KEY);
+        if (Env.AZURE_VISION_ENDPOINT != null || Env.AZURE_VISION_KEY != null) {
+            vision = new ComputerVision(Env.AZURE_VISION_ENDPOINT, Env.AZURE_VISION_KEY);
+            logger.info("Computer vision activated");
+        }
         attendance = new AttendanceService();
     }
 

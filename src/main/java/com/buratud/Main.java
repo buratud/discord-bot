@@ -1,6 +1,8 @@
 package com.buratud;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -19,6 +21,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
@@ -42,38 +45,19 @@ public class Main extends ListenerAdapter {
         attendance = Attendance.getInstance();
     }
 
+    private void updateCommands(JDA jda) {
+        List<CommandData> commands = new ArrayList<>();
+        chatGPT.AddCommand(commands);
+        ocr.AddCommand(commands);
+        attendance.AddCommand(commands);
+        jda.updateCommands().addCommands(commands).complete();
+    }
+
     public static void main(String[] args) throws InterruptedException, IOException {
-        JDA jda = JDABuilder.createDefault(Env.DISCORD_TOKEN).enableIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MEMBERS).setMemberCachePolicy(MemberCachePolicy.ALL).addEventListeners(new Main()).build();
+        Main main = new Main();
+        JDA jda = JDABuilder.createDefault(Env.DISCORD_TOKEN).enableIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MEMBERS).setMemberCachePolicy(MemberCachePolicy.ALL).addEventListeners(main).build();
         jda.awaitReady();
-        jda.updateCommands().addCommands(
-                Commands.message("OCR"),
-                Commands.slash("chatgpt", "ChatGPT related command.")
-                        .addSubcommands(new SubcommandData("reset", "Reset chat history."),
-                                new SubcommandData("model", "Switch model.")
-                                        .addOptions(new OptionData(OptionType.STRING, "model", "Set model")
-                                                .addChoice("gpt-3.5-turbo-1106", "gpt-3.5-turbo-1106")
-                                                .addChoice("gpt-4-turbo-preview", "gpt-4-turbo-preview")
-                                                .addChoice("gemini-pro", "gemini-pro")
-                                                .setRequired(true)
-                                        ),
-                                new SubcommandData("activation", "Set activation for continuous use.")
-                                        .addOptions(new OptionData(OptionType.BOOLEAN, "activate", "Set whether to continuously use.")
-                                                .setRequired(true)
-                                        ),
-                                new SubcommandData("oneshot", "Set one shot to save cost.")
-                                        .addOptions(new OptionData(OptionType.BOOLEAN, "activate", "Set whether to activate one-shot.")
-                                                .setRequired(true)
-                                        ),
-                                new SubcommandData("system", "Set a system message for this channel.")
-                        ),
-                Commands.slash("attendance", "Attendance command.")
-                        .addSubcommands(new SubcommandData("start", "Start attendance session.")
-                                        .addOptions(new OptionData(OptionType.CHANNEL, "channel", "Voice channel to be monitor.")),
-                                new SubcommandData("stop", "Stop attendance session.")
-                                        .addOptions(new OptionData(OptionType.CHANNEL, "channel", "Voice channel to be monitor.")),
-                                new SubcommandData("now", "Get current attendance.")
-                                        .addOptions(new OptionData(OptionType.CHANNEL, "channel", "Voice channel to be monitor.")))
-        ).complete();
+        main.updateCommands(jda);
     }
 
     @Override

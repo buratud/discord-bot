@@ -11,6 +11,11 @@ import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 
 public class Attendance implements Handler {
@@ -36,6 +42,17 @@ public class Attendance implements Handler {
             instance = new Attendance();
         }
         return instance;
+    }
+
+    public void AddCommand(List<CommandData> dataList) {
+        CommandData data = Commands.slash("attendance", "Attendance command.")
+                .addSubcommands(new SubcommandData("start", "Start attendance session.")
+                                .addOptions(new OptionData(OptionType.CHANNEL, "channel", "Voice channel to be monitor.")),
+                        new SubcommandData("stop", "Stop attendance session.")
+                                .addOptions(new OptionData(OptionType.CHANNEL, "channel", "Voice channel to be monitor.")),
+                        new SubcommandData("now", "Get current attendance.")
+                                .addOptions(new OptionData(OptionType.CHANNEL, "channel", "Voice channel to be monitor.")));
+        dataList.add(data);
     }
 
     @Override
