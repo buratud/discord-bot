@@ -59,7 +59,7 @@ public class AttendanceService {
 
     public Path GenerateCurrentAttendance(VoiceChannel channel) {
         Guild guild = channel.getGuild();
-        List<Member> members = guild.getMembers();
+        List<Member> members = guild.loadMembers().get();
         ZonedDateTime currentDatetime = ZonedDateTime.now(ZoneId.of("Asia/Bangkok"));
         String currentDate = currentDatetime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         String currentTime = currentDatetime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
@@ -107,12 +107,12 @@ public class AttendanceService {
                 GuildVoiceState state = member.getVoiceState();
                 if (state == null || !Objects.equals(state.getChannel(), channel)) {
                     absTable.getCellByPosition(0, absRow).setStringValue(member.getId());
-                    absTable.getCellByPosition(1, absRow).setStringValue(member.getEffectiveName());
+                    absTable.getCellByPosition(1, absRow).setStringValue(member.getUser().getName());
                     absTable.getCellByPosition(2, absRow).setStringValue(member.getNickname());
                     absRow++;
                 } else {
                     attTable.getCellByPosition(0, attIndex).setStringValue(member.getId());
-                    attTable.getCellByPosition(1, attIndex).setStringValue(member.getEffectiveName());
+                    attTable.getCellByPosition(1, attIndex).setStringValue(member.getUser().getName());
                     attTable.getCellByPosition(2, attIndex).setStringValue(member.getNickname());
                     attIndex++;
                 }
