@@ -275,7 +275,7 @@ public final class ChatGpt implements Handler {
         final int MAX_LENGTH = 2000;
         List<String> responses = new ArrayList<>();
         int strlen = response.length();
-        Pattern pattern = Pattern.compile("(\\d+\\.|-|\\*)\\s");
+        Pattern pattern = Pattern.compile("(\\**\\d+\\.|-|\\*)\\s");
         Matcher matcher = pattern.matcher(response);
         int start = 0, end = 0;
         int startLine = 0, endLine = -2;
