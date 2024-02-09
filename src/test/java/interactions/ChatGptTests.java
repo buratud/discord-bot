@@ -326,4 +326,55 @@ public class ChatGptTests {
         List<String> actual = ChatGpt.splitResponse(original);
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void testSplitResponse7() {
+        String original = """
+                **1. Performance:**
+                   - **Apache2:** Apache2 is known for its stability and reliability, but it can be slower compared to Nginx, especially in high-traffic environments.
+                   - **Nginx:** Nginx is known for its exceptional performance and scalability. It can handle a large number of concurrent connections and requests efficiently, making it suitable for high-traffic websites and applications.
+                **2. Memory Usage:**
+                   - **Apache2:** Apache2 typically uses more memory than Nginx, especially when serving static content.
+                   - **Nginx:** Nginx is known for its low memory footprint. It is designed to handle a large number of requests with minimal memory usage, making it a good choice for resource-constrained environments.
+                **3. Configuration Complexity:**
+                   - **Apache2:** Apache2's configuration can be complex due to its wide range of features and options. It requires a deeper understanding of its configuration directives and modules to optimize performance and security.
+                   - **Nginx:** Nginx's configuration is generally considered simpler and more straightforward compared to Apache2. Its configuration directives are more concise and modular, making it easier to set up and manage.
+                **4. Caching:**
+                   - **Apache2:** Apache2 has built-in caching mechanisms, such as mod_cache and mod_mem_cache, which can be used to improve performance by caching frequently requested content in memory.
+                   - **Nginx:** Nginx has a powerful caching system that allows fine-grained control over caching policies. It supports various caching methods, including proxy caching, reverse caching, and dynamic caching, providing greater flexibility in optimizing cache performance.
+                **5. Security:**
+                   - **Apache2:** Apache2 has a long history of security updates and patches, making it a stable and secure web server. However, it is vulnerable to certain attacks, such as denial-of-service (DoS) attacks, if not properly configured and secured.
+                   - **Nginx:** Nginx is also known for its security, and it has a strong track record of addressing security vulnerabilities promptly. It includes features such as rate limiting, IP filtering, and URL rewriting, which can help protect against common attacks.
+                **6. Popularity:**
+                   - **Apache2:** Apache2 is one of the most popular web servers worldwide, with a significant market share due to its stability, reliability, and wide range of features.
+                   - **Nginx:** Nginx has gained significant popularity in recent years due to its exceptional performance, scalability, and low resource usage. It is widely used for high-traffic websites, applications, and load balancing.
+                **7. Use Cases:**
+                   - **Apache2:** Apache2 is suitable for various use cases, including static and dynamic content serving, virtual hosting, and SSL/TLS encryption. It is often used as a general-purpose web server for small to medium-sized websites and applications.
+                   - **Nginx:** Nginx is ideal for high-performance environments, such as e-commerce websites, video streaming platforms, and APIs. It excels in serving static content, reverse proxying, and load balancing.""";
+        List<String> expected = List.of("""
+                **1. Performance:**
+                   - **Apache2:** Apache2 is known for its stability and reliability, but it can be slower compared to Nginx, especially in high-traffic environments.
+                   - **Nginx:** Nginx is known for its exceptional performance and scalability. It can handle a large number of concurrent connections and requests efficiently, making it suitable for high-traffic websites and applications.
+                **2. Memory Usage:**
+                   - **Apache2:** Apache2 typically uses more memory than Nginx, especially when serving static content.
+                   - **Nginx:** Nginx is known for its low memory footprint. It is designed to handle a large number of requests with minimal memory usage, making it a good choice for resource-constrained environments.
+                **3. Configuration Complexity:**
+                   - **Apache2:** Apache2's configuration can be complex due to its wide range of features and options. It requires a deeper understanding of its configuration directives and modules to optimize performance and security.
+                   - **Nginx:** Nginx's configuration is generally considered simpler and more straightforward compared to Apache2. Its configuration directives are more concise and modular, making it easier to set up and manage.
+                **4. Caching:**
+                   - **Apache2:** Apache2 has built-in caching mechanisms, such as mod_cache and mod_mem_cache, which can be used to improve performance by caching frequently requested content in memory.
+                   - **Nginx:** Nginx has a powerful caching system that allows fine-grained control over caching policies. It supports various caching methods, including proxy caching, reverse caching, and dynamic caching, providing greater flexibility in optimizing cache performance.""",
+                """
+                **5. Security:**
+                   - **Apache2:** Apache2 has a long history of security updates and patches, making it a stable and secure web server. However, it is vulnerable to certain attacks, such as denial-of-service (DoS) attacks, if not properly configured and secured.
+                   - **Nginx:** Nginx is also known for its security, and it has a strong track record of addressing security vulnerabilities promptly. It includes features such as rate limiting, IP filtering, and URL rewriting, which can help protect against common attacks.
+                **6. Popularity:**
+                   - **Apache2:** Apache2 is one of the most popular web servers worldwide, with a significant market share due to its stability, reliability, and wide range of features.
+                   - **Nginx:** Nginx has gained significant popularity in recent years due to its exceptional performance, scalability, and low resource usage. It is widely used for high-traffic websites, applications, and load balancing.
+                **7. Use Cases:**
+                   - **Apache2:** Apache2 is suitable for various use cases, including static and dynamic content serving, virtual hosting, and SSL/TLS encryption. It is often used as a general-purpose web server for small to medium-sized websites and applications.
+                   - **Nginx:** Nginx is ideal for high-performance environments, such as e-commerce websites, video streaming platforms, and APIs. It excels in serving static content, reverse proxying, and load balancing.""");
+        List<String> actual = ChatGpt.splitResponse(original);
+        assertEquals(expected, actual);
+    }
 }
