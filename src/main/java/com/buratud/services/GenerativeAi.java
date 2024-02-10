@@ -27,14 +27,17 @@ public class GenerativeAi {
     private static String DEFAULT_MODEL = "gpt-3.5-turbo-1106";
     private static final String SYSTEM_MESSAGE_FILE = "./system_message.txt";
 
-    public final ChatGpt chatGpt;
-    public final GeminiAi gemini;
+    public ChatGpt chatGpt = null;
+    public GeminiAi gemini = null;
 
     public GenerativeAi() throws IOException {
         store = new com.buratud.stores.dynamodb.AiStore();
         readSystemMessage();
-        chatGpt = new ChatGpt(Env.OPENAI_API_KEY);
-        gemini = new GeminiAi(Env.GEMINI_API_KEY);
+        if (Env.OPENAI_API_KEY != null) {
+            chatGpt = new ChatGpt(Env.OPENAI_API_KEY);
+        } if (Env.GEMINI_API_KEY != null) {
+            gemini = new GeminiAi(Env.GEMINI_API_KEY);
+        }
     }
 
     public void setDefaultModel(String model) {
