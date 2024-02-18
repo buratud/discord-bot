@@ -27,8 +27,7 @@ public interface ChatCompletionRequestMapper {
             targetRole = com.buratud.entity.googleai.Role.MODEL;
         }
         content.setRole(targetRole);
-        TextPart part = new TextPart();
-        part.setText(value.getContent());
+        TextPart part = new TextPart(value.getContent());
         content.setParts(List.of(part));
         return content;
     }
