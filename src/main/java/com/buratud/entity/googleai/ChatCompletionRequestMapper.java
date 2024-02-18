@@ -1,7 +1,7 @@
 package com.buratud.entity.googleai;
 
-import com.buratud.entity.openai.chat.ChatMessage;
-import com.buratud.entity.openai.chat.Role;
+import com.buratud.entity.ai.ChatMessage;
+import com.buratud.entity.ai.Role;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -10,7 +10,7 @@ import java.util.List;
 
 @Mapper
 public interface ChatCompletionRequestMapper {
-    ChatCompletionRequestMapper INSTANCE = Mappers.getMapper( ChatCompletionRequestMapper.class );
+    ChatCompletionRequestMapper INSTANCE = Mappers.getMapper(ChatCompletionRequestMapper.class);
 
     @Mapping(source = "content", target = "parts[0].text")
     List<Content> ChatMessageToContent(List<ChatMessage> chatMessages);
@@ -27,7 +27,7 @@ public interface ChatCompletionRequestMapper {
             targetRole = com.buratud.entity.googleai.Role.MODEL;
         }
         content.setRole(targetRole);
-        Part part = new Part();
+        TextPart part = new TextPart();
         part.setText(value.getContent());
         content.setParts(List.of(part));
         return content;

@@ -24,37 +24,3 @@ public class ChatCompletionRequest {
     }
 }
 
-@Getter
-@Setter
-@JsonInclude(JsonInclude.Include.NON_NULL)
-class Content {
-    @JsonSerialize(using = RoleSerializer.class)
-    private Role role;
-    private List<Part> parts;
-}
-
-@Getter
-@Setter
-@JsonInclude(JsonInclude.Include.NON_NULL)
-class Part {
-    private String text;
-}
-
-@Getter
-@Setter
-@JsonInclude(JsonInclude.Include.NON_NULL)
-class SafetySetting {
-    private String category;
-    private String threshold;
-}
-
-@Getter
-@Setter
-@JsonInclude(JsonInclude.Include.NON_NULL)
-class GenerationConfig {
-    private List<String> stopSequences;
-    private double temperature;
-    private int maxOutputTokens;
-    private double topP;
-    private int topK;
-}
