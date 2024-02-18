@@ -4,12 +4,10 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@DynamoDbBean
 public class ChatMessage {
     @JsonSerialize(using = RoleSerializer.class)
     private Role role;
