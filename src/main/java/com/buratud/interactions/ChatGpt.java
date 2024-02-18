@@ -102,6 +102,7 @@ public final class ChatGpt implements Handler {
                 }
                 Message message = event.getMessage();
                 String rawMessage = message.getContentRaw();
+                List<Message.Attachment> attachments = message.getAttachments();
                 String guildId = event.getGuild().getId();
                 String channelId = event.getChannel().getId();
                 String userId = event.getAuthor().getId();
@@ -115,7 +116,12 @@ public final class ChatGpt implements Handler {
                         rawMessage = rawMessage.substring(lastPos + 1).trim();
                     }
                     rawMessage = replaceFileContent(rawMessage, message.getAttachments());
-                    PromptResponse res = ai.sendStreamEnabled(guildId, channelId, userId, rawMessage);
+                    PromptResponse res;
+                    if (attachments.isEmpty()) {
+                        res = ai.sendStreamEnabled(guildId, channelId, userId, rawMessage);
+                    } else {
+                        res = ai.sendStreamEnabled(guildId, channelId, userId, rawMessage, attachments);
+                    }
                     String responseMessage = res.getMessage();
                     if (res.getFinishReason() != FinishReason.NORMAL && res.getFinishReason() != FinishReason.VIOLATION) {
                         responseMessage += "\n\nMessage was cut due to " + res.getFinishReason().toString();

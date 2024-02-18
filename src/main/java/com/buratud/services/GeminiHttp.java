@@ -26,7 +26,19 @@ public class GeminiHttp {
         this.streamChatUrl = String.format("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:streamGenerateContent?key=%s", apiKey);
     }
 
-    public HttpResponse<Object> sendChatCompletionRequestWithStreamEnabled(ChatCompletionRequest body, Flow.Subscriber<? super String> subscriber) throws InterruptedException, ExecutionException, IOException {
+    public HttpResponse<Object> sendChatCompletionRequestWithStreamEnabled(ChatCompletionRequest body, Flow.Subscriber<? super String> subscriber) throws InterruptedException, IOException {
+        String requestBody = body.toJson();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(streamChatUrl))
+                .timeout(Duration.ofSeconds(5))
+                .header("Content-Type", "application/json")
+                .POST(BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
+                .build();
+
+        return client.send(request, BodyHandlers.fromLineSubscriber(subscriber, s -> null, "\n"));
+    }
+
+    public HttpResponse<Object> sendChatCompletionWithImageRequestWithStreamEnabled(ChatCompletionRequest body, Flow.Subscriber<? super String> subscriber) throws InterruptedException, IOException {
         String requestBody = body.toJson();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(streamChatUrl))

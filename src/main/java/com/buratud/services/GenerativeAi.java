@@ -6,6 +6,7 @@ import com.buratud.entity.ai.AiChatMetadata;
 import com.buratud.entity.ai.AiChatSession;
 import com.buratud.entity.ai.ChatMessage;
 import com.buratud.entity.ai.Role;
+import net.dv8tion.jda.api.entities.Message;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,7 +30,8 @@ public class GenerativeAi {
         readSystemMessage();
         if (Env.OPENAI_API_KEY != null) {
             chatGpt = new ChatGpt(Env.OPENAI_API_KEY);
-        } if (Env.GEMINI_API_KEY != null) {
+        }
+        if (Env.GEMINI_API_KEY != null) {
             gemini = new GeminiAi(Env.GEMINI_API_KEY);
         }
     }
@@ -117,6 +119,10 @@ public class GenerativeAi {
     }
 
     public PromptResponse sendStreamEnabled(String guildId, String channelId, String userId, String message) throws IOException, ExecutionException, InterruptedException {
+        return sendStreamEnabled(guildId, channelId, userId, message, null);
+    }
+
+    public PromptResponse sendStreamEnabled(String guildId, String channelId, String userId, String message, List<Message.Attachment> attachments) throws IOException, ExecutionException, InterruptedException {
         AiChatMetadata metadata = store.getMetadata(guildId, channelId, userId);
         AiChatSession session;
         boolean isNewSession = false;
@@ -137,7 +143,12 @@ public class GenerativeAi {
             session = store.getSession(guildId, channelId, userId, metadata.getCurrentSession().toString());
         }
         List<ChatMessage> messages = session.getHistory();
-        messages.add(new ChatMessage(Role.USER, message));
+        if (attachments != null) {
+            messages.add(new ChatMessage(Role.USER, message, attachments.stream().map(Message.Attachment::getUrl).toList()));
+            session.setHasImage(true);
+        } else {
+            messages.add(new ChatMessage(Role.USER, message));
+        }
         PromptResponse response;
         if (session.getModel().startsWith("gpt")) {
             response = chatGpt.sendStreamEnabled(session);

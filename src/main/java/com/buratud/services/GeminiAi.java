@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Flow;
 
 public class GeminiAi {
+    static final String geminiImageModel = "gemini-1.0-pro-vision-latest";
     private static final Logger logger = LogManager.getLogger(GeminiAi.class);
     private final GeminiHttp client;
 
@@ -29,6 +30,9 @@ public class GeminiAi {
 
     public PromptResponse sendStreamEnabled(AiChatSession session) throws InterruptedException, ExecutionException, IOException {
         List<ChatMessage> messages = session.getHistory();
+        if (session.getHasImage()) {
+            session.setModel(geminiImageModel);
+        }
         ChatCompletionRequest request = new ChatCompletionRequestBuilder().withMessages(messages).build();
         EventStreamSubscriber subscriber = new EventStreamSubscriber();
         client.sendChatCompletionRequestWithStreamEnabled(request, subscriber);

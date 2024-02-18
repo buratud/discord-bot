@@ -45,6 +45,9 @@ public final class AiChatSession extends MemberChannelData {
     @JsonProperty("history")
     private List<ChatMessage> history;
 
+    @JsonProperty("has_image")
+    private boolean hasImage;
+
     @DynamoDbPartitionKey
     @DynamoDbAttribute("partition_key")
     public String getPartitionKey() {
@@ -76,5 +79,10 @@ public final class AiChatSession extends MemberChannelData {
     @DynamoDbAttribute("history")
     public List<ChatMessage> getHistory() {
         return history;
+    }
+
+    @DynamoDbAttribute("has_image")
+    public boolean getHasImage() {
+        return hasImage;
     }
 }
