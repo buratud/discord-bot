@@ -1,4 +1,4 @@
-package com.buratud.entity.openai;
+package com.buratud.entity.ai;
 
 import com.buratud.entity.MemberChannelData;
 import com.fasterxml.jackson.annotation.JsonProperty;
