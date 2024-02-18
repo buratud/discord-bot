@@ -9,7 +9,11 @@ import java.util.List;
 public interface ChatCompletionRequestMapper {
     ChatCompletionRequestMapper INSTANCE = Mappers.getMapper(ChatCompletionRequestMapper.class);
 
-    List<ChatMessage> fromGeneric(List<com.buratud.entity.ai.ChatMessage> chatMessages);
+    ChatMessage fromGeneric(com.buratud.entity.ai.ChatMessage chatMessages);
 
-    List<com.buratud.entity.ai.ChatMessage> toGeneric(List<ChatMessage> chatMessages);
+    com.buratud.entity.ai.ChatMessage toGeneric(ChatMessage chatMessages);
+
+    List<ChatMessage> fromGenericList(List<com.buratud.entity.ai.ChatMessage> chatMessages);
+
+    List<com.buratud.entity.ai.ChatMessage> toGenericList(List<ChatMessage> chatMessages);
 }
