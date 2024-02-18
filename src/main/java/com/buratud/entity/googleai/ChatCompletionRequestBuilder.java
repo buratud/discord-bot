@@ -1,6 +1,6 @@
 package com.buratud.entity.googleai;
 
-import com.buratud.entity.openai.chat.ChatMessage;
+import com.buratud.entity.ai.ChatMessage;
 
 import java.util.List;
 

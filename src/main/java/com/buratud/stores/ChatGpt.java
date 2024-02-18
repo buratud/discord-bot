@@ -1,7 +1,7 @@
 package com.buratud.stores;
 
-import com.buratud.entity.openai.AiChatMetadata;
-import com.buratud.entity.openai.AiChatSession;
+import com.buratud.entity.ai.AiChatMetadata;
+import com.buratud.entity.ai.AiChatSession;
 
 public interface ChatGpt {
     AiChatMetadata getMetadata(String guildId, String channelId, String userId);

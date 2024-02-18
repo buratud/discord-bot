@@ -3,8 +3,7 @@ package com.buratud.services;
 import com.buratud.Utility;
 import com.buratud.entity.ai.FinishReason;
 import com.buratud.entity.ai.PromptResponse;
-import com.buratud.entity.openai.AiChatMetadata;
-import com.buratud.entity.openai.AiChatSession;
+import com.buratud.entity.ai.AiChatSession;
 import com.buratud.entity.openai.chat.*;
 import com.buratud.entity.openai.moderation.ModerationResponse;
 import lombok.SneakyThrows;
@@ -38,7 +37,7 @@ public class ChatGpt {
     }
 
     public PromptResponse sendStreamEnabled(AiChatSession session) throws InterruptedException, ExecutionException, IOException {
-        List<ChatMessage> messages = session.getHistory();
+        List<ChatMessage> messages = ChatCompletionRequestMapper.INSTANCE.fromGenericList(session.getHistory());
         String message = messages.get(messages.size()-1).getContent();
         String flagged = moderationCheck(message);
         if (flagged != null) {

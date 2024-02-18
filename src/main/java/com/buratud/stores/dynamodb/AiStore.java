@@ -1,8 +1,8 @@
 package com.buratud.stores.dynamodb;
 
-import com.buratud.entity.openai.AiChatMetadata;
-import com.buratud.entity.openai.AiChatSession;
-import com.buratud.entity.openai.chat.ChatMessage;
+import com.buratud.entity.ai.AiChatMetadata;
+import com.buratud.entity.ai.AiChatSession;
+import com.buratud.entity.ai.ChatMessage;
 import com.buratud.stores.ChatGpt;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

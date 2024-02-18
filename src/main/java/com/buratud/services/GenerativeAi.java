@@ -2,22 +2,16 @@ package com.buratud.services;
 
 import com.buratud.Env;
 import com.buratud.entity.ai.PromptResponse;
-import com.buratud.entity.openai.AiChatMetadata;
-import com.buratud.entity.openai.AiChatSession;
-import com.buratud.entity.openai.chat.ChatMessage;
-import com.buratud.entity.openai.chat.Role;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import com.buratud.entity.ai.AiChatMetadata;
+import com.buratud.entity.ai.AiChatSession;
+import com.buratud.entity.ai.ChatMessage;
+import com.buratud.entity.ai.Role;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
