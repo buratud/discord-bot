@@ -129,7 +129,7 @@ public class GenerativeAi {
         if (metadata == null) {
             metadata = reset(guildId, channelId, userId);
         }
-        if (metadata.getCurrentSession() == null) {
+        if (metadata.getCurrentSession() == null || metadata.getModel().equals("gemini-1.0-pro-vision-latest")) {
             isNewSession = true;
             UUID id = UUID.randomUUID();
             metadata.setCurrentSession(id);
@@ -159,7 +159,7 @@ public class GenerativeAi {
             return response;
         }
         messages.add(new ChatMessage(Role.ASSISTANT, response.getMessage()));
-        if (!metadata.getOneShot()) {
+        if (!metadata.getOneShot() && !session.getModel().equals("gemini-1.0-pro-vision-latest")) {
             if (isNewSession) {
                 store.updateMetadata(metadata);
             }

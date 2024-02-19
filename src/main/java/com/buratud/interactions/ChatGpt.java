@@ -72,6 +72,7 @@ public final class ChatGpt implements Handler {
         }
         if (ai.gemini != null) {
             option.addChoice("gemini-pro", "gemini-pro");
+            option.addChoice("gemini-1.0-pro-vision-latest", "gemini-1.0-pro-vision-latest");
             ai.setDefaultModel("gemini-pro");
         }
         if (!option.getChoices().isEmpty()) {
@@ -246,6 +247,11 @@ public final class ChatGpt implements Handler {
                     \nPlease note that currently Gemini AI **collects your prompt**, so don't type any info you don't want to be collected.
                     Also, there is **no system message** for this model.
                     This model is incapable of generating code so you might get error from time to time.""";
+        }
+        if (model.equals("gemini-1.0-pro-vision-latest")) {
+            message += """
+                    \nThis model does not support multi-turn conversation, so it will not be saved and also not remember last message.
+                    """;
         }
         event.reply(message).setEphemeral(true).complete();
     }
