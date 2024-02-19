@@ -45,7 +45,7 @@ public class GeminiHttp {
         String requestBody = body.toJson();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(streamImageChatUrl))
-                .timeout(Duration.ofSeconds(5))
+                .timeout(Duration.ofSeconds(20))
                 .header("Content-Type", "application/json")
                 .POST(BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
                 .build();
