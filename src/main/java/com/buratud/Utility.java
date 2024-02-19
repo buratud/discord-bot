@@ -60,8 +60,9 @@ public class Utility {
     public static class MimeTypeDetector {
         public static String defaultReturn = "application/octet-stream";
 
-        public static String getMimeType(String filePath) {
-            String extension = filePath.substring(filePath.lastIndexOf(".") + 1).toLowerCase();
+        public static String getMimeType(String url) {
+            String urlNoQueryString = url.split("\\?")[0];
+            String extension = urlNoQueryString.substring(url.lastIndexOf(".") + 1).toLowerCase();
             return switch (extension) {
                 case "png" -> "image/png";
                 case "jpg", "jpeg" -> "image/jpeg";
