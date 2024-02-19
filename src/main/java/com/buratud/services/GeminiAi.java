@@ -35,7 +35,11 @@ public class GeminiAi {
         }
         ChatCompletionRequest request = new ChatCompletionRequestBuilder().withMessages(messages).build();
         EventStreamSubscriber subscriber = new EventStreamSubscriber();
-        client.sendChatCompletionRequestWithStreamEnabled(request, subscriber);
+        if (session.getHasImage()) {
+            client.sendImageChatCompletionRequestWithStreamEnabled(request, subscriber);
+        } else {
+            client.sendChatCompletionRequestWithStreamEnabled(request, subscriber);
+        }
         ChatCompletionStreamResponse[] responses = subscriber.getContent();
         StringBuilder builder = new StringBuilder();
         FinishReason finishReason = FinishReason.NORMAL;

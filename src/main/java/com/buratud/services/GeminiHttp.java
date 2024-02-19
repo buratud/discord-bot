@@ -20,16 +20,31 @@ public class GeminiHttp {
 
     private final String streamChatUrl;
     private static final int timeoutSeconds = 5;
+    private final String streamImageChatUrl;
+
     public GeminiHttp(String apiKey) {
         this.client = HttpClient.newBuilder().build();
         this.apiKey = apiKey;
         this.streamChatUrl = String.format("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:streamGenerateContent?key=%s", apiKey);
+        this.streamImageChatUrl = String.format("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro-vision-latest:streamGenerateContent?key=%s", apiKey);
     }
 
     public HttpResponse<Object> sendChatCompletionRequestWithStreamEnabled(ChatCompletionRequest body, Flow.Subscriber<? super String> subscriber) throws InterruptedException, IOException {
         String requestBody = body.toJson();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(streamChatUrl))
+                .timeout(Duration.ofSeconds(5))
+                .header("Content-Type", "application/json")
+                .POST(BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
+                .build();
+
+        return client.send(request, BodyHandlers.fromLineSubscriber(subscriber, s -> null, "\n"));
+    }
+
+    public HttpResponse<Object> sendImageChatCompletionRequestWithStreamEnabled(ChatCompletionRequest body, Flow.Subscriber<? super String> subscriber) throws InterruptedException, IOException {
+        String requestBody = body.toJson();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(streamImageChatUrl))
                 .timeout(Duration.ofSeconds(5))
                 .header("Content-Type", "application/json")
                 .POST(BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
