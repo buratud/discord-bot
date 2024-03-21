@@ -19,7 +19,7 @@ import java.util.concurrent.ExecutionException;
 public class GenerativeAi {
     private final com.buratud.stores.ChatGpt store;
     private ChatMessage system;
-    private static String DEFAULT_MODEL = "gpt-3.5-turbo-1106";
+    private static String DEFAULT_MODEL = "gpt-3.5-turbo-0125";
     private static final String SYSTEM_MESSAGE_FILE = "./system_message.txt";
 
     public ChatGpt chatGpt = null;
@@ -63,7 +63,7 @@ public class GenerativeAi {
         }
         metadata.setCurrentSession(null);
         if (metadata.getModel().startsWith("gpt-4")) {
-            metadata.setModel("gpt-3.5-turbo-1106");
+            metadata.setModel(DEFAULT_MODEL);
         }
         store.createMetadata(metadata);
         return metadata;

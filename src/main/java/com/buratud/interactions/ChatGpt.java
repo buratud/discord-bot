@@ -66,12 +66,12 @@ public final class ChatGpt implements Handler {
         OptionData option = new OptionData(OptionType.STRING, "model", "Set model")
                 .setRequired(true);
         if (ai.chatGpt != null) {
-            option.addChoice("gpt-3.5-turbo-1106", "gpt-3.5-turbo-1106");
+            option.addChoice("gpt-3.5-turbo-0125", "gpt-3.5-turbo-0125");
             option.addChoice("gpt-4-turbo-preview", "gpt-4-turbo-preview");
             ai.setDefaultModel("gpt-3.5-turbo-1106");
         }
         if (ai.gemini != null) {
-            option.addChoice("gemini-pro", "gemini-pro");
+            option.addChoice("gemini-1.0-pro", "gemini-1.0-pro");
             option.addChoice("gemini-1.0-pro-vision-latest", "gemini-1.0-pro-vision-latest");
             ai.setDefaultModel("gemini-pro");
         }
